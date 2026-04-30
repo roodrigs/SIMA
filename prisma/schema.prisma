@@ -1,0 +1,37 @@
+generator client {
+  provider   = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  category      String   // MATEMATICA, CIENCIAS, GEOGRAFIA
+  text          String
+  options       String   // No SQLite, guardado como string JSON
+  correctAnswer Int      // Índice da resposta correta (0-3)
+  createdAt     DateTime @default(now())
+  answers       Answer[]
+}
+
+model Assessment {
+  id              String   @id @default(cuid())
+  operatorName    String
+  intervieweeName String
+  schoolName      String
+  schoolClass     String   // Adicionado: Turma
+  date            DateTime @default(now())
+  answers         Answer[]
+}
+
+model Answer {
+  id           String     @id @default(cuid())
+  assessmentId String
+  questionId   String
+  selectedIdx  Int
+  isCorrect    Boolean
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  question     Question   @relation(fields: [questionId], references: [id])
+}
