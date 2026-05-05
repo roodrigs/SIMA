@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart } from "lucide-react";
+import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Area, AreaChart as ReAreaChart
 } from 'recharts';
@@ -14,7 +14,8 @@ export default function AdminDashboard() {
     grade: "ALL",
     zone: "ALL",
     region: "ALL",
-    school: "ALL"
+    school: "ALL",
+    search: ""
   });
   const router = useRouter();
 
@@ -44,6 +45,15 @@ export default function AdminDashboard() {
     if (filters.zone !== "ALL") students = students.filter(s => s.zone === filters.zone);
     if (filters.region !== "ALL") students = students.filter(s => s.region === filters.region);
     if (filters.school !== "ALL") students = students.filter(s => s.school === filters.school);
+    
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      students = students.filter(s => 
+        s.student.toLowerCase().includes(search) || 
+        s.school.toLowerCase().includes(search) || 
+        s.operator.toLowerCase().includes(search)
+      );
+    }
 
     if (students.length === 0) return { ...rawData, students: [], global: { avgHits: 0, avgMisses: 0, totalHits: 0, globalWeightedAvg: 0, stdDev: 0 }, distribution: [], categories: [], schools: [], classes: [], grades: [], zones: [], regions: [] };
 
@@ -113,11 +123,6 @@ export default function AdminDashboard() {
     };
   }, [rawData, filters]);
 
-  const uniqueSchools = useMemo(() => {
-    if (!rawData) return [];
-    return Array.from(new Set(rawData.students.map((s: any) => s.school)));
-  }, [rawData]);
-
   const handleLogout = () => {
     localStorage.removeItem("sima_admin_auth");
     router.push("/login");
@@ -130,7 +135,74 @@ export default function AdminDashboard() {
     </div>
   );
 
-  const displayData = filteredData || rawData;
+  const data = filteredData || rawData;
+
+  return (
+    <main className="min-h-screen bg-surface-50 flex flex-col pb-20">
+      <nav className="bg-white border-b border-surface-100 px-8 py-4 sticky top-0 z-50">
+        <div className="max-w-[1600px] mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20"><GraduationCap size={22}/></div>
+            <span className="font-black text-2xl tracking-tighter text-surface-900">SIMA ADMIN</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex flex-col text-right">
+              <span className="text-[10px] font-black text-surface-900/40 uppercase tracking-widest">Painel de Controle</span>
+              <span className="text-xs font-bold text-surface-900">BI & Analytics Real-time</span>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="w-10 h-10 flex items-center justify-center bg-surface-50 text-surface-900/40 hover:text-danger-500 hover:bg-danger-50 transition-all rounded-xl"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex-1 max-w-[1600px] mx-auto w-full p-6 md:p-12 space-y-12">
+        {/* Filtros e Busca */}
+        <div className="bg-white p-8 rounded-[40px] border border-surface-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="w-12 h-12 bg-primary-50 text-primary-600 rounded-2xl flex items-center justify-center shadow-inner"><Search size={22} /></div>
+            <input 
+              type="text" 
+              placeholder="Buscar aluno, escola ou operador..." 
+              className="bg-transparent font-bold text-surface-900 placeholder:text-surface-900/20 focus:outline-none w-full md:w-64"
+              value={filters.search}
+              onChange={(e) => setFilters({...filters, search: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+            <select 
+              className="bg-surface-50 p-4 rounded-2xl font-bold text-surface-900 text-xs focus:outline-none border-none cursor-pointer"
+              value={filters.school}
+              onChange={(e) => setFilters({...filters, school: e.target.value})}
+            >
+              <option value="ALL">Todas as Escolas</option>
+              {Array.from(new Set(rawData.students.map((s: any) => s.school))).map((s: any) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <select 
+              className="bg-surface-50 p-4 rounded-2xl font-bold text-surface-900 text-xs focus:outline-none border-none cursor-pointer"
+              value={filters.grade}
+              onChange={(e) => setFilters({...filters, grade: e.target.value})}
+            >
+              <option value="ALL">Todas as Séries</option>
+              {[5,6,7,8,9].map(g => (
+                <option key={g} value={g.toString()}>{g}º Ano</option>
+              ))}
+            </select>
+            <button 
+              onClick={() => setFilters({ grade: "ALL", zone: "ALL", region: "ALL", school: "ALL", search: "" })}
+              className="p-4 bg-surface-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-surface-800 transition-all"
+            >
+              Limpar Filtros
+            </button>
+          </div>
+        </div>
 
         {/* KPIs Principais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">

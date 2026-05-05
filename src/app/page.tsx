@@ -105,7 +105,15 @@ export default function SIMAApp() {
       setView('REVIEW');
       
       // Ajuste 1: Limpar os campos após finalizar
-      setFormData({ school: "", class: "", operator: "", student: "" });
+      setFormData({ 
+        school: "", 
+        class: "", 
+        operator: "", 
+        student: "",
+        grade: "5",
+        zone: "NORTE",
+        region: "URBANA"
+      });
       setAnswers({});
     } catch (err: any) {
       alert("Erro ao salvar: " + err.message);
