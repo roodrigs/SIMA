@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     // @ts-ignore - Opção necessária para desenvolvimento via IP na rede
-    allowedDevOrigins: ["10.121.162.41", "localhost:3000"]
+    allowedDevOrigins: ["10.177.186.114:3000", "10.177.186.114", "10.121.162.41", "localhost:3000"]
   }
 };
 

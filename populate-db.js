@@ -103,16 +103,29 @@ const subjects = [
 db.prepare('DELETE FROM Answer').run();
 db.prepare('DELETE FROM Assessment').run();
 db.prepare('DELETE FROM Question').run();
+db.prepare('DELETE FROM User').run(); // Limpa usuários para evitar erro de duplicata
 
-const insert = db.prepare('INSERT INTO Question (id, category, text, options, correctAnswer, createdAt) VALUES (?, ?, ?, ?, ?, ?)');
+const insert = db.prepare('INSERT INTO Question (id, category, grade, text, options, correctAnswer, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)');
+const insertUser = db.prepare('INSERT INTO User (id, username, password, createdAt) VALUES (?, ?, ?, ?)');
 
 const now = new Date().toISOString();
 
-for (const subject of subjects) {
-  for (const q of subject.questions) {
-    insert.run(generateId(), subject.name, q.text, JSON.stringify(q.options), q.correct, now);
+// Criar usuário admin padrão
+insertUser.run(generateId(), 'admin', '123', now);
+console.log('Usuário administrador criado: admin / 123');
+
+const grades = [5, 6, 7, 8, 9];
+
+for (const grade of grades) {
+  for (const subject of subjects) {
+    // Para cada série, vamos pegar as perguntas do assunto
+    // Para tornar o banco rico, vou repetir as perguntas em cada série para fins de teste,
+    // mas em um cenário real teríamos perguntas específicas por série.
+    for (const q of subject.questions) {
+      insert.run(generateId(), subject.name, grade, q.text, JSON.stringify(q.options), q.correct, now);
+    }
   }
 }
 
-console.log('Banco de dados populado com 75 questões diretamente!');
+console.log('Banco de dados populado com questões para as séries 5, 6, 7, 8 e 9!');
 db.close();

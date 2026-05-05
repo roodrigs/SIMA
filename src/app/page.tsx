@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { 
   GraduationCap, ChevronRight, School, User, UserCircle, 
   ArrowLeft, ArrowRight, CheckCircle2, Send, Loader2, AlertCircle,
-  BarChart3, LayoutDashboard, XCircle, Info, RefreshCcw, Users, ClipboardCheck
+  BarChart3, LayoutDashboard, XCircle, Info, RefreshCcw, Users, ClipboardCheck,
+  Lock
 } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend 
@@ -19,63 +21,39 @@ type Question = {
   description: string;
 };
 
-type AppView = 'FORM' | 'LOADING' | 'QUIZ' | 'REVIEW' | 'DASHBOARD' | 'ERROR';
+type AppView = 'FORM' | 'LOADING' | 'QUIZ' | 'REVIEW' | 'ERROR';
 
 export default function SIMAApp() {
   const [view, setView] = useState<AppView>('FORM');
-  const [formData, setFormData] = useState({ school: "", class: "", operator: "", student: "" });
+  const [formData, setFormData] = useState({ 
+    school: "", 
+    class: "", 
+    operator: "", 
+    student: "", 
+    grade: "5",
+    zone: "NORTE",
+    region: "URBANA"
+  });
   const [questions, setQuestions] = useState<Record<string, Question[]>>({});
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [activeTab, setActiveTab] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [dashboardData, setDashboardData] = useState({ 
-    schools: [], 
-    categories: [], 
-    classes: [], 
-    diagnostics: [],
-    students: [] 
-  });
-  const [searchTerm, setSearchTerm] = useState("");
 
+  // Ajuste 3: Subir para o topo ao trocar de categoria
   useEffect(() => {
-    fetchDashboard();
-  }, []);
-
-  const getDiagnostic = (score: number) => {
-    if (score >= 80) return "Excelente domínio dos conteúdos.";
-    if (score >= 60) return "Bom desempenho, conceitos principais compreendidos.";
-    if (score >= 40) return "Atenção necessária, requer reforço em conceitos básicos.";
-    return "Nível crítico, necessário plano de recuperação imediato.";
-  };
-
-  const filteredStudents = useMemo(() => {
-    return dashboardData.students.filter((s: any) => 
-      s.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.school.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [dashboardData.students, searchTerm]);
-
-  const fetchDashboard = async () => {
-    try {
-      const res = await fetch("/api/dashboard");
-      const data = await res.json();
-      setDashboardData(data);
-    } catch (e) {
-      console.error("Erro dashboard:", e);
-    }
-  };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
 
   const handleStart = async () => {
-    if (!formData.school || !formData.class || !formData.operator || !formData.student) {
+    if (!formData.school || !formData.class || !formData.operator || !formData.student || !formData.grade) {
       alert("Por favor, preencha todos os campos.");
       return;
     }
 
     setView('LOADING');
     try {
-      const res = await fetch("/api/questions");
+      const res = await fetch(`/api/questions?grade=${formData.grade}`);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
@@ -112,6 +90,9 @@ export default function SIMAApp() {
           schoolClass: formData.class,
           operatorName: formData.operator,
           intervieweeName: formData.student,
+          grade: formData.grade,
+          zone: formData.zone,
+          region: formData.region,
           answers: payloadAnswers
         })
       });
@@ -122,7 +103,10 @@ export default function SIMAApp() {
       }
 
       setView('REVIEW');
-      fetchDashboard();
+      
+      // Ajuste 1: Limpar os campos após finalizar
+      setFormData({ school: "", class: "", operator: "", student: "" });
+      setAnswers({});
     } catch (err: any) {
       alert("Erro ao salvar: " + err.message);
     } finally {
@@ -151,72 +135,69 @@ export default function SIMAApp() {
 
   if (view === 'LOADING') return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-      <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-      <p className="text-gray-500 font-bold animate-pulse uppercase tracking-widest">Sorteando questões...</p>
+      <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-4" />
+      <p className="text-surface-900/40 font-black animate-pulse uppercase tracking-[0.2em] text-sm">Sorteando questões...</p>
     </div>
   );
 
   if (view === 'REVIEW') return (
-    <main className="min-h-screen bg-gray-50 flex flex-col pb-20">
+    <main className="min-h-screen bg-surface-50 flex flex-col pb-20">
       <div className="max-w-4xl mx-auto w-full p-6 md:p-12 space-y-12">
-        <div className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-xl text-center space-y-6">
-          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto">
+        <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-xl shadow-surface-900/5 text-center space-y-6">
+          <div className="w-20 h-20 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle2 size={40} />
           </div>
           <div className="space-y-2">
-            <h1 className="text-4xl font-black text-gray-900">Resultado: {reviewStats.percent}%</h1>
-            <p className="text-gray-500 font-medium">{formData.student} (Turma {formData.class}) acertou {reviewStats.correct} de {reviewStats.total} questões.</p>
+            <h1 className="text-4xl font-black text-surface-900">Avaliação Concluída!</h1>
+            <p className="text-surface-900/50 font-medium">Os dados foram salvos e os campos de formulário foram limpos para a próxima avaliação.</p>
           </div>
           
-          <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 text-left">
-            <h4 className="text-blue-800 font-black text-sm uppercase mb-2 flex items-center gap-2">
+          <div className="bg-primary-50/50 p-6 rounded-3xl border border-primary-100 text-left">
+            <h4 className="text-primary-700 font-black text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
               <ClipboardCheck size={16} /> Diagnóstico Individual
             </h4>
-            <p className="text-blue-900 font-medium leading-relaxed italic">
+            <p className="text-primary-900 font-medium leading-relaxed italic">
               "{reviewStats.diagnostic}"
             </p>
           </div>
 
           <div className="flex justify-center gap-4">
-            <button onClick={() => setView('DASHBOARD')} className="bg-black text-white px-8 h-14 rounded-2xl font-bold flex items-center gap-2 hover:bg-gray-800 transition-all">
-              <LayoutDashboard size={18} /> Ver Dashboard
-            </button>
-            <button onClick={() => window.location.reload()} className="bg-gray-100 text-gray-600 px-8 h-14 rounded-2xl font-bold hover:bg-gray-200 transition-all">
+            <button onClick={() => setView('FORM')} className="btn-primary">
               Nova Avaliação
             </button>
           </div>
         </div>
 
-        <h2 className="text-2xl font-black text-gray-800 pt-8">Revisão Detalhada</h2>
+        <h2 className="text-2xl font-black text-surface-900 pt-8">Revisão Detalhada</h2>
         
         {Object.values(questions).flat().map((q, idx) => {
           const isCorrect = answers[q.id] === q.correctAnswer;
           return (
-            <div key={q.id} className={`bg-white p-8 rounded-[32px] border-2 space-y-6 ${isCorrect ? 'border-green-100' : 'border-red-100'}`}>
+            <div key={q.id} className={`bg-white p-8 rounded-[32px] border-2 space-y-6 transition-all ${isCorrect ? 'border-success-500/10' : 'border-danger-500/10'}`}>
               <div className="flex justify-between items-start">
                 <div className="flex gap-4">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isCorrect ? 'bg-success-50 text-success-600' : 'bg-danger-50 text-danger-600'}`}>
                     {idx + 1}
                   </span>
-                  <p className="text-lg font-bold text-gray-800">{q.text}</p>
+                  <p className="text-lg font-bold text-surface-900">{q.text}</p>
                 </div>
-                {isCorrect ? <CheckCircle2 className="text-green-500" /> : <XCircle className="text-red-500" />}
+                {isCorrect ? <CheckCircle2 className="text-success-500" /> : <XCircle className="text-danger-500" />}
               </div>
 
               {!isCorrect && (
-                <div className="bg-gray-50 p-6 rounded-2xl space-y-4">
+                <div className="bg-surface-50 p-6 rounded-2xl space-y-4">
                   <div className="flex gap-4 items-center">
-                    <div className="text-xs font-black uppercase text-gray-400">Resposta do Aluno:</div>
-                    <div className="text-sm font-bold text-red-600">{q.options[answers[q.id]] || "Não respondida"}</div>
+                    <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta do Aluno:</div>
+                    <div className="text-sm font-bold text-danger-600">{q.options[answers[q.id]] || "Não respondida"}</div>
                   </div>
                   <div className="flex gap-4 items-center">
-                    <div className="text-xs font-black uppercase text-gray-400">Resposta Correta:</div>
-                    <div className="text-sm font-bold text-green-600">{q.options[q.correctAnswer]}</div>
+                    <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta Correta:</div>
+                    <div className="text-sm font-bold text-success-600">{q.options[q.correctAnswer]}</div>
                   </div>
-                  <div className="pt-4 border-t border-gray-200 flex gap-3">
-                    <Info size={16} className="text-blue-500 shrink-0 mt-1" />
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      <strong>Por que esta é a correta?</strong><br/>
+                  <div className="pt-4 border-t border-surface-200 flex gap-3">
+                    <Info size={16} className="text-primary-500 shrink-0 mt-1" />
+                    <p className="text-sm text-surface-900/60 leading-relaxed">
+                      <strong className="text-surface-900">Por que esta é a correta?</strong><br/>
                       {q.description}
                     </p>
                   </div>
@@ -230,56 +211,62 @@ export default function SIMAApp() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <nav className="bg-white border-b border-gray-100 px-8 py-4 sticky top-0 z-50">
+    <main className="min-h-screen bg-surface-50 flex flex-col">
+      <nav className="bg-white border-b border-surface-100 px-8 py-4 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><GraduationCap size={18}/></div>
-             <span className="font-black text-xl tracking-tighter">SIMA</span>
+             <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20"><GraduationCap size={22}/></div>
+             <span className="font-black text-2xl tracking-tighter text-surface-900">SIMA</span>
           </div>
-          <div className="flex bg-gray-100 p-1 rounded-xl">
-             <button onClick={() => setView('FORM')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${view !== 'DASHBOARD' ? 'bg-white shadow-sm text-black' : 'text-gray-400'}`}>Avaliação</button>
-             <button onClick={() => setView('DASHBOARD')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${view === 'DASHBOARD' ? 'bg-white shadow-sm text-black' : 'text-gray-400'}`}>Dashboard</button>
+          <div className="flex items-center gap-4">
+            <Link href="/login" title="Acesso Admin" className="w-10 h-10 flex items-center justify-center text-surface-900/20 hover:text-primary-600 transition-all hover:bg-surface-50 rounded-xl">
+               <Lock size={18} />
+            </Link>
           </div>
         </div>
       </nav>
 
       <div className="flex-1 max-w-6xl mx-auto w-full p-6 md:p-12">
-        {view === 'DASHBOARD' ? (
-          <DashboardView 
-            dashboardData={dashboardData}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filteredStudents={filteredStudents}
-            getDiagnostic={getDiagnostic}
-            setView={setView}
-          />
-        ) : view === 'QUIZ' ? (
-          <div className="animate-in fade-in duration-500">
-             <div className="flex justify-between items-center mb-12">
+        {view === 'QUIZ' ? (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                  <h1 className="text-4xl font-black text-gray-900">{activeTab}</h1>
-                  <p className="text-gray-400 font-medium">Aluno: {formData.student} (Turma: {formData.class}) • {progress}% Concluído</p>
+                  <h1 className="text-5xl font-black text-surface-900 tracking-tighter mb-2">{activeTab}</h1>
+                  <p className="text-surface-900/40 font-bold uppercase text-xs tracking-widest">
+                    Aluno: <span className="text-surface-900">{formData.student}</span> • Turma: <span className="text-surface-900">{formData.class}</span>
+                  </p>
                 </div>
-                <div className="flex gap-2">
-                  {categories.map(cat => (
-                    <button key={cat} onClick={() => setActiveTab(cat)} className={`w-3 h-3 rounded-full transition-all ${activeTab === cat ? 'bg-blue-600 w-8' : 'bg-gray-200'}`} />
-                  ))}
+                <div className="space-y-3 md:text-right">
+                  <div className="flex gap-2 md:justify-end">
+                    {categories.map(cat => (
+                      <button key={cat} onClick={() => setActiveTab(cat)} className={`h-2 rounded-full transition-all ${activeTab === cat ? 'bg-primary-600 w-12' : 'bg-surface-200 w-4'}`} />
+                    ))}
+                  </div>
+                  {/* Ajuste 2: Contador de respostas respondidas */}
+                  <p className="text-xs font-black text-primary-600 tracking-widest">{answeredCount} de {totalQuestions} QUESTÕES RESPONDIDAS ({progress}%)</p>
                 </div>
              </div>
 
              <div className="space-y-8 pb-32">
                 {questions[activeTab]?.map((q, idx) => (
-                  <div key={q.id} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
-                    <p className="text-xl font-bold text-gray-800">{idx + 1}. {q.text}</p>
-                    <div className="grid gap-3">
+                  <div key={q.id} className="card-premium space-y-6">
+                    <div className="flex gap-4">
+                      <span className="text-primary-600 font-black text-xl italic opacity-20">{String(idx + 1).padStart(2, '0')}</span>
+                      <p className="text-2xl font-black text-surface-900 tracking-tight leading-tight">{q.text}</p>
+                    </div>
+                    <div className="grid gap-4">
                       {q.options.map((opt, oi) => (
                         <button 
                           key={oi} 
                           onClick={() => handleAnswer(q.id, oi)}
-                          className={`p-5 rounded-2xl border-2 text-left font-semibold transition-all ${answers[q.id] === oi ? 'border-blue-600 bg-blue-50/50 text-blue-700' : 'border-gray-50 bg-gray-50/50 hover:border-gray-200 text-gray-600'}`}
+                          className={`p-6 rounded-[24px] border-2 text-left font-bold transition-all text-lg ${answers[q.id] === oi ? 'border-primary-500 bg-primary-50/50 text-primary-700 shadow-md shadow-primary-500/5' : 'border-surface-50 bg-surface-50/50 hover:border-surface-200 text-surface-900/60'}`}
                         >
-                          {opt}
+                          <div className="flex items-center gap-4">
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${answers[q.id] === oi ? 'border-primary-500 bg-primary-500' : 'border-surface-200'}`}>
+                              {answers[q.id] === oi && <div className="w-2 h-2 bg-white rounded-full" />}
+                            </div>
+                            {opt}
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -287,33 +274,89 @@ export default function SIMAApp() {
                 ))}
              </div>
 
-             <footer className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-lg bg-black/90 backdrop-blur-xl rounded-[32px] p-4 flex gap-4 shadow-2xl">
-                <button disabled={categories.indexOf(activeTab) === 0} onClick={() => setActiveTab(categories[categories.indexOf(activeTab) - 1])} className="flex-1 h-14 rounded-2xl font-bold text-white/50 hover:text-white disabled:opacity-0">Anterior</button>
-                <button disabled={categories.indexOf(activeTab) === categories.length - 1} onClick={() => setActiveTab(categories[categories.indexOf(activeTab) + 1])} className="flex-1 h-14 bg-white/10 rounded-2xl font-bold text-white">Próximo</button>
-                <button onClick={handleSubmit} disabled={answeredCount === 0} className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg disabled:opacity-20"><Send size={20} /></button>
+             <footer className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-xl bg-surface-900/90 backdrop-blur-2xl rounded-[32px] p-2 flex gap-2 shadow-2xl border border-white/10 items-center">
+                {categories.indexOf(activeTab) > 0 && (
+                  <button onClick={() => setActiveTab(categories[categories.indexOf(activeTab) - 1])} className="flex-1 h-14 rounded-2xl font-black text-white/40 hover:text-white hover:bg-white/5 transition-all uppercase text-[10px] tracking-widest">
+                    Anterior
+                  </button>
+                )}
+                
+                {categories.indexOf(activeTab) !== categories.length - 1 ? (
+                  <button onClick={() => setActiveTab(categories[categories.indexOf(activeTab) + 1])} className="flex-[2] h-14 bg-white/10 rounded-2xl font-black text-white hover:bg-white/20 transition-all uppercase text-xs tracking-widest">
+                    Próximo
+                  </button>
+                ) : (
+                  <div className="flex-[2] flex items-center justify-center">
+                    <span className="text-success-500 font-black text-[10px] tracking-widest uppercase animate-pulse">Finalizar Matéria</span>
+                  </div>
+                )}
+
+                <button onClick={handleSubmit} disabled={answeredCount === 0 || isSubmitting} className="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-500/40 disabled:opacity-20 hover:bg-primary-400 transition-all shrink-0">
+                  {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                </button>
              </footer>
           </div>
         ) : (
           <div className="max-w-md mx-auto space-y-12 py-10 animate-in slide-in-from-bottom-8 duration-1000">
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-white rounded-[28px] flex items-center justify-center border border-gray-100 shadow-xl mx-auto mb-6">
-                <GraduationCap size={40} className="text-blue-600" />
+              <div className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center border border-surface-100 shadow-2xl shadow-primary-500/10 mx-auto mb-8">
+                <GraduationCap size={48} className="text-primary-600" />
               </div>
-              <h1 className="text-5xl font-black tracking-tighter text-gray-900">SIMA</h1>
-              <p className="text-gray-400 text-lg font-medium italic">Sistema de Mapeamento</p>
+              <h1 className="text-6xl font-black tracking-tighter text-surface-900">SIMA</h1>
+              <p className="text-primary-600/40 text-sm font-black uppercase tracking-[0.3em]">Sistema de Mapeamento</p>
             </div>
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <input className="w-full h-16 bg-white border border-gray-100 rounded-2xl px-6 font-bold shadow-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" placeholder="Escola" value={formData.school} onChange={e => setFormData({...formData, school: e.target.value})} />
-                <input className="w-full h-16 bg-white border border-gray-100 rounded-2xl px-6 font-bold shadow-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" placeholder="Turma (ex: 3º A)" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} />
+                <div className="space-y-1.5">
+                  <label className="label-minimal">Escola</label>
+                  <input className="input-clean" placeholder="Nome" value={formData.school} onChange={e => setFormData({...formData, school: e.target.value})} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="label-minimal">Turma</label>
+                  <input className="input-clean" placeholder="Ex: 3º A" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} />
+                </div>
               </div>
-              <input className="w-full h-16 bg-white border border-gray-100 rounded-2xl px-6 font-bold shadow-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" placeholder="Nome do Operador" value={formData.operator} onChange={e => setFormData({...formData, operator: e.target.value})} />
-              <input className="w-full h-16 bg-white border border-gray-100 rounded-2xl px-6 font-bold shadow-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all" placeholder="Nome do Aluno" value={formData.student} onChange={e => setFormData({...formData, student: e.target.value})} />
+              <div className="space-y-1.5">
+                <label className="label-minimal">Operador</label>
+                <input className="input-clean" placeholder="Nome completo" value={formData.operator} onChange={e => setFormData({...formData, operator: e.target.value})} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label-minimal">Aluno</label>
+                <input className="input-clean" placeholder="Nome completo" value={formData.student} onChange={e => setFormData({...formData, student: e.target.value})} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label-minimal">Ano Escolar</label>
+                <select className="input-clean bg-white appearance-none" value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value})}>
+                  <option value="5">5º Ano</option>
+                  <option value="6">6º Ano</option>
+                  <option value="7">7º Ano</option>
+                  <option value="8">8º Ano</option>
+                  <option value="9">9º Ano</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="label-minimal">Zona</label>
+                  <select className="input-clean bg-white appearance-none" value={formData.zone} onChange={e => setFormData({...formData, zone: e.target.value})}>
+                    <option value="NORTE">Norte</option>
+                    <option value="SUL">Sul</option>
+                    <option value="LESTE">Leste</option>
+                    <option value="OESTE">Oeste</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="label-minimal">Região</label>
+                  <select className="input-clean bg-white appearance-none" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})}>
+                    <option value="URBANA">Urbana</option>
+                    <option value="RURAL">Rural</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <button onClick={handleStart} className="w-full h-20 bg-blue-600 text-white rounded-[28px] text-xl font-black shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-              Iniciar Avaliação <ChevronRight />
+            <button onClick={handleStart} className="w-full h-20 bg-primary-600 text-white rounded-[32px] text-xl font-black shadow-2xl shadow-primary-500/40 hover:bg-primary-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+              Iniciar Avaliação <ChevronRight size={24} />
             </button>
           </div>
         )}
@@ -321,171 +364,3 @@ export default function SIMAApp() {
     </main>
   );
 }
-
-const DashboardView = ({ 
-  dashboardData, 
-  searchTerm, 
-  setSearchTerm, 
-  filteredStudents, 
-  getDiagnostic, 
-  setView 
-}: {
-  dashboardData: any;
-  searchTerm: string;
-  setSearchTerm: (val: string) => void;
-  filteredStudents: any[];
-  getDiagnostic: (score: number) => string;
-  setView: (view: AppView) => void;
-}) => (
-  <div className="space-y-12 animate-in fade-in duration-700 pb-20">
-    <div className="flex justify-between items-end">
-      <div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Rendimento Geral</h1>
-        <p className="text-gray-400 font-medium">Análise de desempenho por escola, turma e matéria</p>
-      </div>
-      <button onClick={() => setView('FORM')} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
-        <RefreshCcw size={16} /> Nova Avaliação
-      </button>
-    </div>
-
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Rendimento por Matéria */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <BarChart3 size={20} className="text-purple-500" /> Rendimento por Matéria (%)
-        </h3>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={dashboardData.categories} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                {dashboardData.categories.map((entry: any, index: number) => (
-                  <Cell key={`cell-${index}`} fill={['#3b82f6', '#a855f7', '#ec4899'][index % 3]} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{borderRadius: '16px'}} />
-              <Legend verticalAlign="bottom" align="center" />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Desempenho por Turma */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <Users size={20} className="text-blue-500" /> Desempenho por Turma (%)
-        </h3>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={dashboardData.classes}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis dataKey="class" axisLine={false} tickLine={false} tick={{fontSize: 12, fontWeight: 'bold'}} />
-              <YAxis hide domain={[0, 100]} />
-              <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: 'none'}} />
-              <Bar dataKey="score" radius={[10, 10, 10, 10]} barSize={40}>
-                {dashboardData.classes.map((entry: any, index: number) => (
-                  <Cell key={`cell-${index}`} fill={entry.score > 70 ? '#22c55e' : entry.score > 50 ? '#3b82f6' : '#ef4444'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-
-    {/* Diagnóstico das Turmas */}
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-8">
-      <h3 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-        <ClipboardCheck size={28} className="text-green-600" /> Diagnóstico Pedagógico das Turmas
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dashboardData.diagnostics.map((diag: any, i: number) => (
-          <div key={i} className="p-6 rounded-3xl bg-gray-50 border border-gray-100 space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="font-black text-xl text-gray-900">{diag.class}</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${diag.score >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {diag.score}%
-              </span>
-            </div>
-            <p className="text-gray-600 text-sm leading-relaxed font-medium">
-              {diag.diagnostic}
-            </p>
-          </div>
-        ))}
-        {dashboardData.diagnostics.length === 0 && (
-           <p className="text-gray-400 italic">Nenhum dado de turma disponível para diagnóstico.</p>
-        )}
-      </div>
-    </div>
-
-    {/* Relatório Detalhado de Alunos */}
-    <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h3 className="text-2xl font-black text-gray-800 flex items-center gap-3">
-          <User size={28} className="text-blue-600" /> Relatório Detalhado de Alunos
-        </h3>
-        
-        <div className="relative max-w-sm w-full">
-          <input 
-            type="text" 
-            placeholder="Pesquisar aluno, turma ou escola..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 pl-10 font-medium text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-          />
-          <Info size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-gray-400 text-xs font-black uppercase tracking-widest border-b border-gray-50">
-              <th className="px-6 py-4">Aluno</th>
-              <th className="px-6 py-4">Turma / Escola</th>
-              <th className="px-6 py-4">Diagnóstico Individual</th>
-              <th className="px-6 py-4">Nota</th>
-              <th className="px-6 py-4">Data</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {filteredStudents.map((s: any) => (
-              <tr key={s.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-4">
-                  <p className="font-bold text-gray-800">{s.student}</p>
-                  <p className="text-xs text-gray-400 font-medium">Op: {s.operator}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="font-bold text-gray-600 text-sm">{s.class}</p>
-                  <p className="text-xs text-gray-400 font-medium">{s.school}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <p className="text-sm text-gray-500 font-medium leading-tight max-w-xs">
-                    {getDiagnostic(s.score)}
-                  </p>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                      <div className={`h-full ${s.score >= 60 ? 'bg-green-500' : 'bg-red-500'}`} style={{ width: `${s.score}%` }} />
-                    </div>
-                    <span className={`text-sm font-black ${s.score >= 60 ? 'text-green-600' : 'text-red-600'}`}>{s.score}%</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-400 font-bold">
-                  {new Date(s.date).toLocaleDateString('pt-BR')}
-                </td>
-              </tr>
-            ))}
-            {filteredStudents.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">
-                  {searchTerm ? "Nenhum aluno encontrado para esta busca." : "Nenhum aluno avaliado ainda."}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-);

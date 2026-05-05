@@ -1,6 +1,9 @@
-import pkg from '@prisma/client';
-const { PrismaClient } = pkg;
-const prisma = new PrismaClient();
+import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+
+// No Prisma 7, o construtor parece exigir ao menos um objeto vazio {}
+// para não disparar o erro de "non-empty options".
+const prisma = new PrismaClient({});
 
 async function main() {
   const subjects = [
@@ -77,7 +80,7 @@ async function main() {
         { text: "Quantos continentes existem?", options: ["4", "5", "6", "7"], correct: 2 },
         { text: "Qual o ponto mais alto da Terra?", options: ["Monte Kilimanjaro", "Monte Everest", "Andes", "Pico da Neblina"], correct: 1 },
         { text: "Qual país tem o formato de uma bota?", options: ["Grécia", "Portugal", "Itália", "Espanha"], correct: 2 },
-        { text: "Qual o deserto mais seco do mundo?", options: ["Saara", "Atacama", "Gobi", "Kalahari"], correct: 1 },
+        { text: "Qual o desertos mais seco do mundo?", options: ["Saara", "Atacama", "Gobi", "Kalahari"], correct: 1 },
         { text: "Qual a capital da França?", options: ["Londres", "Madri", "Berlim", "Paris"], correct: 3 },
         { text: "Qual país é conhecido como o 'Sol Nascente'?", options: ["China", "Japão", "Coreia", "Vietnã"], correct: 1 },
         { text: "Onde fica a Muralha da China?", options: ["Japão", "China", "Mongólia", "Tailândia"], correct: 1 },
@@ -96,25 +99,45 @@ async function main() {
     }
   ];
 
-  for (const subject of subjects) {
-    for (const q of subject.questions) {
-      await prisma.question.create({
-        data: {
-          category: subject.name,
-          text: q.text,
-          options: JSON.stringify(q.options),
-          correctAnswer: q.correct
-        }
-      });
+  console.log('Iniciando limpeza do banco...');
+  await prisma.answer.deleteMany();
+  await prisma.assessment.deleteMany();
+  await prisma.question.deleteMany();
+  await prisma.user.deleteMany();
+
+  console.log('Criando usuário admin...');
+  await prisma.user.create({
+    data: {
+      username: 'admin',
+      password: '123'
+    }
+  });
+
+  const grades = [5, 6, 7, 8, 9];
+
+  console.log('Populando questões...');
+  for (const grade of grades) {
+    for (const subject of subjects) {
+      for (const q of subject.questions) {
+        await prisma.question.create({
+          data: {
+            category: subject.name,
+            grade: grade,
+            text: q.text,
+            options: q.options,
+            correctAnswer: q.correct
+          }
+        });
+      }
     }
   }
 
-  console.log('Seed completo: 75 questões criadas.');
+  console.log('✅ Seed completo: Usuário admin criado e questões geradas para todas as séries.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Erro no Seed:', e);
     process.exit(1);
   })
   .finally(async () => {

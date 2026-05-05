@@ -3,17 +3,25 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider  = "postgresql"
 }
 
 model Question {
   id            String   @id @default(cuid())
   category      String   // MATEMATICA, CIENCIAS, GEOGRAFIA
+  grade         Int      @default(5) // 5, 6, 7, 8, 9
   text          String
-  options       String   // No SQLite, guardado como string JSON
+  options       Json     // No PostgreSQL, usamos Json nativo
   correctAnswer Int      // Índice da resposta correta (0-3)
   createdAt     DateTime @default(now())
   answers       Answer[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }
 
 model Assessment {
@@ -22,6 +30,9 @@ model Assessment {
   intervieweeName String
   schoolName      String
   schoolClass     String   // Adicionado: Turma
+  grade           Int      @default(5)
+  zone            String   @default("NORTE") // NORTE, SUL, LESTE, OESTE
+  region          String   @default("URBANA") // URBANA, RURAL
   date            DateTime @default(now())
   answers         Answer[]
 }

@@ -1,29 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent: #0066cc;
-  --color-bg-main: #ffffff;
-  --color-text-main: #1d1d1f;
+  /* Brand Colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  /* Semantic Colors */
+  --color-success-50: #ecfdf5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  
+  --color-danger-50: #fff1f2;
+  --color-danger-500: #f43f5e;
+  --color-danger-600: #e11d48;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+
+  /* Neutrals & Surfaces - Softer Palette */
+  --color-surface-50: #f1f4f8;  /* Fundo principal mais relaxante */
+  --color-surface-100: #e8ebf0;
+  --color-surface-200: #dce1e8;
+  --color-surface-900: #1a1f26; /* Texto levemente menos "preto puro" */
+
+  --color-accent: var(--color-primary-500);
+  --color-bg-main: var(--color-surface-50);
+  --color-text-main: var(--color-surface-900);
 }
 
 body {
-  background-color: #fafafa;
-  color: #1d1d1f;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--color-surface-50);
+  color: var(--color-text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 @layer components {
   .input-clean {
-    @apply w-full bg-white border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 rounded-2xl transition-all outline-none text-gray-800 text-lg;
+    @apply w-full bg-white border border-surface-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 py-4 px-5 rounded-2xl transition-all outline-none text-surface-900 text-lg shadow-sm;
   }
 
-  .btn-apple {
-    @apply bg-[#1d1d1f] text-white hover:bg-black active:scale-[0.98] transition-all duration-300 font-semibold rounded-2xl shadow-sm hover:shadow-xl;
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 active:scale-[0.98] transition-all duration-300 font-bold rounded-2xl shadow-lg shadow-primary-500/20 py-4 px-8;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-surface-900 border border-surface-200 hover:bg-surface-50 active:scale-[0.98] transition-all duration-300 font-bold rounded-2xl py-4 px-8;
+  }
+
+  .card-premium {
+    @apply bg-white p-8 rounded-[32px] border border-surface-100 shadow-sm hover:shadow-md transition-shadow duration-300;
   }
 
   .label-minimal {
-    @apply text-[13px] font-semibold text-gray-400 uppercase tracking-wider mb-2 block ml-1;
+    @apply text-[11px] font-black text-surface-900/40 uppercase tracking-[0.1em] mb-2 block ml-1;
   }
 }
 
