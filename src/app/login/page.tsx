@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Lock, User, ChevronRight, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { GraduationCap, Lock, User, ChevronRight, Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -98,6 +99,15 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+
+        <div className="text-center pt-4">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-surface-900/40 hover:text-primary-600 font-bold text-xs uppercase tracking-widest transition-all"
+          >
+            <ArrowLeft size={16} /> Voltar para Avaliação
+          </Link>
+        </div>
       </div>
     </main>
   );
