@@ -36,6 +36,7 @@ export default function SIMAApp() {
   });
   const [questions, setQuestions] = useState<Record<string, Question[]>>({});
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [finishedAnswers, setFinishedAnswers] = useState<Record<string, number>>({});
   const [activeTab, setActiveTab] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -59,6 +60,7 @@ export default function SIMAApp() {
 
       setQuestions(data);
       setAnswers({});
+      setFinishedAnswers({});
       const categories = Object.keys(data);
       setActiveTab(categories[0]);
       setView('QUIZ');
@@ -102,6 +104,8 @@ export default function SIMAApp() {
         throw new Error(errorData.error || "Erro ao salvar no servidor");
       }
 
+      // Preserva as respostas para a tela de revisão ANTES de limpar o estado principal
+      setFinishedAnswers({...answers});
       setView('REVIEW');
       
       // Ajuste 1: Limpar os campos após finalizar
@@ -129,7 +133,8 @@ export default function SIMAApp() {
 
   const reviewStats = useMemo(() => {
     const list = Object.values(questions).flat();
-    const correct = list.filter(q => answers[q.id] === q.correctAnswer).length;
+    const currentAnswers = view === 'REVIEW' ? finishedAnswers : answers;
+    const correct = list.filter(q => currentAnswers[q.id] === q.correctAnswer).length;
     const score = list.length > 0 ? Math.round((correct / list.length) * 100) : 0;
     
     let diagnostic = "";
@@ -139,7 +144,7 @@ export default function SIMAApp() {
     else diagnostic = "Nível crítico. É fundamental um plano de reforço imediato para recuperar as bases do aprendizado.";
 
     return { total: list.length, correct, wrong: list.length - correct, percent: score, diagnostic };
-  }, [questions, answers, view]);
+  }, [questions, answers, finishedAnswers, view]);
 
   if (view === 'LOADING') return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
@@ -179,7 +184,7 @@ export default function SIMAApp() {
         <h2 className="text-2xl font-black text-surface-900 pt-8">Revisão Detalhada</h2>
         
         {Object.values(questions).flat().map((q, idx) => {
-          const isCorrect = answers[q.id] === q.correctAnswer;
+          const isCorrect = finishedAnswers[q.id] === q.correctAnswer;
           return (
             <div key={q.id} className={`bg-white p-8 rounded-[32px] border-2 space-y-6 transition-all ${isCorrect ? 'border-success-500 bg-success-50/10' : 'border-danger-500 bg-danger-50/10'}`}>
               <div className="flex justify-between items-start">
@@ -205,7 +210,7 @@ export default function SIMAApp() {
               <div className="bg-white/50 p-6 rounded-2xl border border-surface-100 space-y-4">
                   <div className="flex gap-4 items-center">
                     <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta do Aluno:</div>
-                    <div className={`text-sm font-bold ${isCorrect ? 'text-success-600' : 'text-danger-600'}`}>{q.options[answers[q.id]] || "Não respondida"}</div>
+                    <div className={`text-sm font-bold ${isCorrect ? 'text-success-600' : 'text-danger-600'}`}>{q.options[finishedAnswers[q.id]] || "Não respondida"}</div>
                   </div>
                   {!isCorrect && (
                     <div className="flex gap-4 items-center">
