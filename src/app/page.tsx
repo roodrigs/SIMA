@@ -30,9 +30,9 @@ export default function SIMAApp() {
     class: "", 
     operator: "", 
     student: "", 
-    grade: "5",
+    grade: "12",
     zone: "NORTE",
-    region: "URBANA"
+    schoolNetwork: "PUBLICA"
   });
   const [questions, setQuestions] = useState<Record<string, Question[]>>({});
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -92,7 +92,7 @@ export default function SIMAApp() {
           intervieweeName: formData.student,
           grade: formData.grade,
           zone: formData.zone,
-          region: formData.region,
+          schoolNetwork: formData.schoolNetwork,
           answers: payloadAnswers
         })
       });
@@ -110,9 +110,9 @@ export default function SIMAApp() {
         class: "", 
         operator: "", 
         student: "",
-        grade: "5",
+        grade: "12",
         zone: "NORTE",
-        region: "URBANA"
+        schoolNetwork: "PUBLICA"
       });
       setAnswers({});
     } catch (err: any) {
@@ -181,27 +181,38 @@ export default function SIMAApp() {
         {Object.values(questions).flat().map((q, idx) => {
           const isCorrect = answers[q.id] === q.correctAnswer;
           return (
-            <div key={q.id} className={`bg-white p-8 rounded-[32px] border-2 space-y-6 transition-all ${isCorrect ? 'border-success-500/10' : 'border-danger-500/10'}`}>
+            <div key={q.id} className={`bg-white p-8 rounded-[32px] border-2 space-y-6 transition-all ${isCorrect ? 'border-success-500 bg-success-50/10' : 'border-danger-500 bg-danger-50/10'}`}>
               <div className="flex justify-between items-start">
                 <div className="flex gap-4">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isCorrect ? 'bg-success-50 text-success-600' : 'bg-danger-50 text-danger-600'}`}>
+                  <span className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isCorrect ? 'bg-success-500 text-white' : 'bg-danger-500 text-white'}`}>
                     {idx + 1}
                   </span>
-                  <p className="text-lg font-bold text-surface-900">{q.text}</p>
+                  <div>
+                    <p className="text-lg font-black text-surface-900">{q.text}</p>
+                    <div className="flex gap-2 mt-2">
+                       <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider ${isCorrect ? 'bg-success-100 text-success-700' : 'bg-danger-100 text-danger-700'}`}>
+                         {isCorrect ? 'ACERTOU' : 'ERROU'}
+                       </span>
+                       <span className="bg-surface-100 text-surface-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">
+                         {q.category.replace('_', ' ')}
+                       </span>
+                    </div>
+                  </div>
                 </div>
-                {isCorrect ? <CheckCircle2 className="text-success-500" /> : <XCircle className="text-danger-500" />}
+                {isCorrect ? <CheckCircle2 className="text-success-500" size={32} /> : <XCircle className="text-danger-500" size={32} />}
               </div>
 
-              {!isCorrect && (
-                <div className="bg-surface-50 p-6 rounded-2xl space-y-4">
+              <div className="bg-white/50 p-6 rounded-2xl border border-surface-100 space-y-4">
                   <div className="flex gap-4 items-center">
                     <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta do Aluno:</div>
-                    <div className="text-sm font-bold text-danger-600">{q.options[answers[q.id]] || "Não respondida"}</div>
+                    <div className={`text-sm font-bold ${isCorrect ? 'text-success-600' : 'text-danger-600'}`}>{q.options[answers[q.id]] || "Não respondida"}</div>
                   </div>
-                  <div className="flex gap-4 items-center">
-                    <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta Correta:</div>
-                    <div className="text-sm font-bold text-success-600">{q.options[q.correctAnswer]}</div>
-                  </div>
+                  {!isCorrect && (
+                    <div className="flex gap-4 items-center">
+                      <div className="text-[10px] font-black uppercase text-surface-900/30 tracking-widest">Resposta Correta:</div>
+                      <div className="text-sm font-bold text-success-600">{q.options[q.correctAnswer]}</div>
+                    </div>
+                  )}
                   <div className="pt-4 border-t border-surface-200 flex gap-3">
                     <Info size={16} className="text-primary-500 shrink-0 mt-1" />
                     <p className="text-sm text-surface-900/60 leading-relaxed">
@@ -209,8 +220,7 @@ export default function SIMAApp() {
                       {q.description}
                     </p>
                   </div>
-                </div>
-              )}
+              </div>
             </div>
           );
         })}
@@ -336,11 +346,7 @@ export default function SIMAApp() {
               <div className="space-y-1.5">
                 <label className="label-minimal">Ano Escolar</label>
                 <select className="input-clean bg-white appearance-none" value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value})}>
-                  <option value="5">5º Ano</option>
-                  <option value="6">6º Ano</option>
-                  <option value="7">7º Ano</option>
-                  <option value="8">8º Ano</option>
-                  <option value="9">9º Ano</option>
+                  <option value="12">3º Ano Ensino Médio</option>
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -354,10 +360,10 @@ export default function SIMAApp() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="label-minimal">Região</label>
-                  <select className="input-clean bg-white appearance-none" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})}>
-                    <option value="URBANA">Urbana</option>
-                    <option value="RURAL">Rural</option>
+                  <label className="label-minimal">Rede</label>
+                  <select className="input-clean bg-white appearance-none" value={formData.schoolNetwork} onChange={e => setFormData({...formData, schoolNetwork: e.target.value})}>
+                    <option value="PUBLICA">Pública</option>
+                    <option value="PARTICULAR">Particular</option>
                   </select>
                 </div>
               </div>

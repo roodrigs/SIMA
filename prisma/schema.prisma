@@ -11,11 +11,12 @@ datasource db {
 
 model Question {
   id            String   @id @default(cuid())
-  category      String   // MATEMATICA, CIENCIAS, GEOGRAFIA
-  grade         Int      @default(5) // 5, 6, 7, 8, 9
+  category      String   // MATEMATICA_LOGICA, PORTUGUES, CIENCIAS_BIOLOGICAS, HISTORIA
+  grade         Int      @default(12) // 12 represents 3º ano Ensino Médio
   text          String
   options       Json     // No PostgreSQL, usamos Json nativo
   correctAnswer Int      // Índice da resposta correta (0-3)
+  description   String   @default("") // Adicionado para explicação da resposta
   createdAt     DateTime @default(now())
   answers       Answer[]
 }
@@ -33,9 +34,9 @@ model Assessment {
   intervieweeName String
   schoolName      String
   schoolClass     String   // Adicionado: Turma
-  grade           Int      @default(5)
+  grade           Int      @default(12) // 12 represents 3º ano Ensino Médio
   zone            String   @default("NORTE") // NORTE, SUL, LESTE, OESTE
-  region          String   @default("URBANA") // URBANA, RURAL
+  schoolNetwork   String   @default("PUBLICA") // PARTICULAR, PUBLICA
   date            DateTime @default(now())
   answers         Answer[]
 }

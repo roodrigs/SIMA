@@ -23,7 +23,7 @@ export async function GET() {
     const classStats: Record<string, { correct: number; total: number }> = {};
     const gradeStats: Record<number, { correct: number; total: number }> = {};
     const zoneStats: Record<string, { correct: number; total: number }> = {};
-    const regionStats: Record<string, { correct: number; total: number }> = {};
+    const schoolNetworkStats: Record<string, { correct: number; total: number }> = {};
     const categoryStats: Record<string, { correct: number; total: number }> = {};
     const allScores: number[] = [];
 
@@ -32,13 +32,13 @@ export async function GET() {
       const sClass = (a.schoolClass || "Sem Turma").trim();
       const grade = a.grade;
       const zone = a.zone;
-      const region = a.region;
+      const schoolNetwork = a.schoolNetwork;
 
       if (!schoolStats[school]) schoolStats[school] = { correct: 0, total: 0 };
       if (!classStats[sClass]) classStats[sClass] = { correct: 0, total: 0 };
       if (!gradeStats[grade]) gradeStats[grade] = { correct: 0, total: 0 };
       if (!zoneStats[zone]) zoneStats[zone] = { correct: 0, total: 0 };
-      if (!regionStats[region]) regionStats[region] = { correct: 0, total: 0 };
+      if (!schoolNetworkStats[schoolNetwork]) schoolNetworkStats[schoolNetwork] = { correct: 0, total: 0 };
 
       let assessmentCorrect = 0;
       let assessmentTotal = 0;
@@ -51,7 +51,7 @@ export async function GET() {
         classStats[sClass].total++;
         gradeStats[grade].total++;
         zoneStats[zone].total++;
-        regionStats[region].total++;
+        schoolNetworkStats[schoolNetwork].total++;
         categoryStats[cat].total++;
         assessmentTotal++;
 
@@ -60,7 +60,7 @@ export async function GET() {
           classStats[sClass].correct++;
           gradeStats[grade].correct++;
           zoneStats[zone].correct++;
-          regionStats[region].correct++;
+          schoolNetworkStats[schoolNetwork].correct++;
           categoryStats[cat].correct++;
           assessmentCorrect++;
         }
@@ -71,14 +71,21 @@ export async function GET() {
       }
     });
 
+    const categoryNames: Record<string, string> = {
+      'MATEMATICA_LOGICA': 'Matemática - Raciocínio Lógico',
+      'PORTUGUES': 'Português',
+      'CIENCIAS_BIOLOGICAS': 'Ciências Biológicas',
+      'HISTORIA': 'História'
+    };
+
     const categoriesData = Object.entries(categoryStats).map(([name, stats]) => ({
-      name: name === 'MATEMATICA' ? 'Matemática' : name === 'CIENCIAS' ? 'Ciências' : name === 'GEOGRAFIA' ? 'Geografia' : name,
+      name: categoryNames[name] || name,
       score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
       value: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0 
     }));
 
     const gradesData = Object.entries(gradeStats).map(([name, stats]) => ({
-      grade: `${name}º Ano`,
+      grade: name.toString() === '12' ? '3º Ensino Médio' : `${name}º Ano`,
       score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
     })).sort((a, b) => a.grade.localeCompare(b.grade));
 
@@ -87,8 +94,8 @@ export async function GET() {
       score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
     }));
 
-    const regionsData = Object.entries(regionStats).map(([name, stats]) => ({
-      region: name,
+    const schoolNetworksData = Object.entries(schoolNetworkStats).map(([name, stats]) => ({
+      schoolNetwork: name,
       score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
     }));
 
@@ -153,7 +160,7 @@ export async function GET() {
         class: a.schoolClass,
         grade: a.grade,
         zone: a.zone,
-        region: a.region,
+        schoolNetwork: a.schoolNetwork,
         operator: a.operatorName,
         hits: hits,
         misses: total - hits,
@@ -173,7 +180,7 @@ export async function GET() {
       classes: classesData,
       grades: gradesData,
       zones: zonesData,
-      regions: regionsData,
+      schoolNetworks: schoolNetworksData,
       distribution: distribution,
       diagnostics: classDiagnostics,
       students: studentsData

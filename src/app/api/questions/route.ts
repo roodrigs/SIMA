@@ -42,12 +42,23 @@ export async function GET(request: Request) {
       });
     });
 
-    // Sorteia 10 aleatórias de cada categoria
+    // Sorteia questões conforme a nova regra: 3 MATEMATICA_LOGICA, 3 PORTUGUES, 2 HISTORIA, 2 BIOLOGIA
+    const counts: Record<string, number> = {
+      "MATEMATICA_LOGICA": 3,
+      "PORTUGUES": 3,
+      "HISTORIA": 2,
+      "CIENCIAS_BIOLOGICAS": 2
+    };
+
     const limitedGrouped: any = {};
-    Object.keys(grouped).forEach(cat => {
-      limitedGrouped[cat] = grouped[cat]
-        .sort(() => 0.5 - Math.random()) // Embaralha
-        .slice(0, 10); // Pega 10
+    Object.keys(counts).forEach(cat => {
+      if (grouped[cat]) {
+        limitedGrouped[cat] = grouped[cat]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, counts[cat]);
+      } else {
+        limitedGrouped[cat] = [];
+      }
     });
 
     return NextResponse.json(limitedGrouped);

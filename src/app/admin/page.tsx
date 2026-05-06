@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const [filters, setFilters] = useState({
     grade: "ALL",
     zone: "ALL",
-    region: "ALL",
+    schoolNetwork: "ALL",
     school: "ALL",
     search: ""
   });
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     // Aplicar filtros na lista de alunos (fonte primária de dados)
     if (filters.grade !== "ALL") students = students.filter(s => s.grade === parseInt(filters.grade));
     if (filters.zone !== "ALL") students = students.filter(s => s.zone === filters.zone);
-    if (filters.region !== "ALL") students = students.filter(s => s.region === filters.region);
+    if (filters.schoolNetwork !== "ALL") students = students.filter(s => s.schoolNetwork === filters.schoolNetwork);
     if (filters.school !== "ALL") students = students.filter(s => s.school === filters.school);
     
     if (filters.search) {
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       );
     }
 
-    if (students.length === 0) return { ...rawData, students: [], global: { avgHits: 0, avgMisses: 0, totalHits: 0, globalWeightedAvg: 0, stdDev: 0 }, distribution: [], categories: [], schools: [], classes: [], grades: [], zones: [], regions: [] };
+    if (students.length === 0) return { ...rawData, students: [], global: { avgHits: 0, avgMisses: 0, totalHits: 0, globalWeightedAvg: 0, stdDev: 0 }, distribution: [], categories: [], schools: [], classes: [], grades: [], zones: [], schoolNetworks: [] };
 
     // Recalcular métricas baseadas nos alunos filtrados
     let totalHits = 0;
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
     const classStats: any = {};
     const gradeStats: any = {};
     const zoneStats: any = {};
-    const regionStats: any = {};
+    const schoolNetworkStats: any = {};
 
     students.forEach(s => {
       totalHits += s.hits;
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
       classStats[s.class].hits += s.hits;
       classStats[s.class].total += total;
 
-      const gLabel = `${s.grade}º Ano`;
+      const gLabel = s.grade === 12 ? '3º Ensino Médio' : `${s.grade}º Ano`;
       if (!gradeStats[gLabel]) gradeStats[gLabel] = { hits: 0, total: 0 };
       gradeStats[gLabel].hits += s.hits;
       gradeStats[gLabel].total += total;
@@ -93,9 +93,9 @@ export default function AdminDashboard() {
       zoneStats[s.zone].hits += s.hits;
       zoneStats[s.zone].total += total;
 
-      if (!regionStats[s.region]) regionStats[s.region] = { hits: 0, total: 0 };
-      regionStats[s.region].hits += s.hits;
-      regionStats[s.region].total += total;
+      if (!schoolNetworkStats[s.schoolNetwork]) schoolNetworkStats[s.schoolNetwork] = { hits: 0, total: 0 };
+      schoolNetworkStats[s.schoolNetwork].hits += s.hits;
+      schoolNetworkStats[s.schoolNetwork].total += total;
     });
 
     const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
       classes: Object.entries(classStats).map(([name, s]: any) => ({ class: name, score: Math.round((s.hits / s.total) * 100) })),
       grades: Object.entries(gradeStats).map(([name, s]: any) => ({ grade: name, score: Math.round((s.hits / s.total) * 100) })),
       zones: Object.entries(zoneStats).map(([name, s]: any) => ({ zone: name, score: Math.round((s.hits / s.total) * 100) })),
-      regions: Object.entries(regionStats).map(([name, s]: any) => ({ region: name, score: Math.round((s.hits / s.total) * 100) }))
+      schoolNetworks: Object.entries(schoolNetworkStats).map(([name, s]: any) => ({ schoolNetwork: name, score: Math.round((s.hits / s.total) * 100) }))
     };
   }, [rawData, filters]);
 
@@ -181,9 +181,18 @@ export default function AdminDashboard() {
               onChange={(e) => setFilters({...filters, school: e.target.value})}
             >
               <option value="ALL">Todas as Escolas</option>
-              {Array.from(new Set(rawData.students.map((s: any) => s.school))).map((s: any) => (
+              {rawData && Array.from(new Set(rawData.students.map((s: any) => s.school))).map((s: any) => (
                 <option key={s} value={s}>{s}</option>
               ))}
+            </select>
+            <select 
+              className="bg-surface-50 p-4 rounded-2xl font-bold text-surface-900 text-xs focus:outline-none border-none cursor-pointer"
+              value={filters.schoolNetwork}
+              onChange={(e) => setFilters({...filters, schoolNetwork: e.target.value})}
+            >
+              <option value="ALL">Todas as Redes</option>
+              <option value="PUBLICA">Pública</option>
+              <option value="PARTICULAR">Particular</option>
             </select>
             <select 
               className="bg-surface-50 p-4 rounded-2xl font-bold text-surface-900 text-xs focus:outline-none border-none cursor-pointer"
@@ -191,12 +200,10 @@ export default function AdminDashboard() {
               onChange={(e) => setFilters({...filters, grade: e.target.value})}
             >
               <option value="ALL">Todas as Séries</option>
-              {[5,6,7,8,9].map(g => (
-                <option key={g} value={g.toString()}>{g}º Ano</option>
-              ))}
+              <option value="12">3º Ensino Médio</option>
             </select>
             <button 
-              onClick={() => setFilters({ grade: "ALL", zone: "ALL", region: "ALL", school: "ALL", search: "" })}
+              onClick={() => setFilters({ grade: "ALL", zone: "ALL", schoolNetwork: "ALL", school: "ALL", search: "" })}
               className="p-4 bg-surface-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-surface-800 transition-all"
             >
               Limpar Filtros
@@ -283,17 +290,17 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Por Região */}
+          {/* Por Rede */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-warning-50 text-warning-500 rounded-xl flex items-center justify-center"><MapPin size={20} /></div>
-              Desempenho por Região (%)
+              Desempenho por Rede (%)
             </h3>
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.regions}>
+                <BarChart data={data.schoolNetworks}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="region" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} />
+                  <XAxis dataKey="schoolNetwork" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} />
                   <YAxis hide domain={[0, 100]} />
                   <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}} />
                   <Bar dataKey="score" fill="#f59e0b" radius={[8, 8, 8, 8]} barSize={40} />
@@ -418,7 +425,7 @@ export default function AdminDashboard() {
               <thead>
                 <tr className="text-surface-900/30 text-[10px] font-black uppercase tracking-widest">
                   <th className="px-10 py-6">Aluno</th>
-                  <th className="px-10 py-6">Série/Zona/Região</th>
+                  <th className="px-10 py-6">Série/Zona/Rede</th>
                   <th className="px-10 py-6">Operador</th>
                   <th className="px-10 py-6">Status</th>
                   <th className="px-10 py-6">Média Ponderada (0-10)</th>
@@ -435,9 +442,9 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-10 py-6">
                        <div className="flex gap-2">
-                         <span className="bg-surface-100 text-surface-900 px-3 py-1 rounded-full text-[9px] font-black">{s.grade}º Ano</span>
+                         <span className="bg-surface-100 text-surface-900 px-3 py-1 rounded-full text-[9px] font-black">{s.grade === 12 ? '3º E.M.' : `${s.grade}º Ano`}</span>
                          <span className="bg-primary-50 text-primary-600 px-3 py-1 rounded-full text-[9px] font-black">{s.zone}</span>
-                         <span className="bg-warning-50 text-warning-600 px-3 py-1 rounded-full text-[9px] font-black">{s.region}</span>
+                         <span className="bg-warning-50 text-warning-600 px-3 py-1 rounded-full text-[9px] font-black">{s.schoolNetwork}</span>
                        </div>
                     </td>
                     <td className="px-10 py-6 text-surface-900/60 font-bold">{s.operator}</td>
