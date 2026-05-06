@@ -42,12 +42,12 @@ export async function GET(request: Request) {
       });
     });
 
-    // Sorteia questões conforme a nova regra: 3 MATEMATICA_LOGICA, 3 PORTUGUES, 2 HISTORIA, 2 BIOLOGIA
+    // Sorteia questões conforme a nova regra: 3 MATEMATICA, 3 PORTUGUES, 2 HISTORIA, 2 CIENCIAS BIOLOGICAS
     const counts: Record<string, number> = {
-      "MATEMATICA_LOGICA": 3,
+      "MATEMATICA": 3,
       "PORTUGUES": 3,
       "HISTORIA": 2,
-      "CIENCIAS_BIOLOGICAS": 2
+      "CIENCIAS BIOLOGICAS": 2
     };
 
     const limitedGrouped: any = {};

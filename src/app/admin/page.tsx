@@ -146,6 +146,12 @@ export default function AdminDashboard() {
             <span className="font-black text-2xl tracking-tighter text-surface-900">SIMA ADMIN</span>
           </div>
           <div className="flex items-center gap-6">
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 px-4 py-2 bg-surface-50 text-surface-900/60 hover:text-primary-600 font-bold text-xs rounded-xl transition-all"
+            >
+              <LayoutDashboard size={16} /> Voltar para Avaliação
+            </Link>
             <div className="hidden md:flex flex-col text-right">
               <span className="text-[10px] font-black text-surface-900/40 uppercase tracking-widest">Painel de Controle</span>
               <span className="text-xs font-bold text-surface-900">BI & Analytics Real-time</span>
@@ -250,27 +256,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Gráficos Geográficos e por Série */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-           {/* Por Série */}
-           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
-            <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center"><GraduationCap size={20} /></div>
-              Desempenho por Série (%)
-            </h3>
-            <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.grades}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="grade" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} />
-                  <YAxis hide domain={[0, 100]} />
-                  <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}} />
-                  <Bar dataKey="score" fill="#3b82f6" radius={[8, 8, 8, 8]} barSize={40} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
+        {/* Gráficos Geográficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Por Zona */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">

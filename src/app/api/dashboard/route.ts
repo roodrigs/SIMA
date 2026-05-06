@@ -29,7 +29,7 @@ export async function GET() {
 
     assessments.forEach(a => {
       const school = (a.schoolName || "Outros").trim();
-      const sClass = (a.schoolClass || "Sem Turma").trim();
+      const sClass = `${school} - ${a.schoolClass || "Sem Turma"}`;
       const grade = a.grade;
       const zone = a.zone;
       const schoolNetwork = a.schoolNetwork;
@@ -72,9 +72,9 @@ export async function GET() {
     });
 
     const categoryNames: Record<string, string> = {
-      'MATEMATICA_LOGICA': 'Matemática - Raciocínio Lógico',
+      'MATEMATICA': 'Matemática',
       'PORTUGUES': 'Português',
-      'CIENCIAS_BIOLOGICAS': 'Ciências Biológicas',
+      'CIENCIAS BIOLOGICAS': 'Ciências Biológicas',
       'HISTORIA': 'História'
     };
 
