@@ -2,15 +2,15 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Limpando banco de dados...');
+  console.log('Limpando banco de dados para correção de categorias...');
   await prisma.answer.deleteMany({});
   await prisma.assessment.deleteMany({});
   await prisma.question.deleteMany({});
 
   const questions = [
-    // MATEMATICA_LOGICA (10)
+    // MATEMATICA (10)
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Uma função do 2º grau tem a forma f(x) = ax² + bx + c. Se o gráfico dessa função é uma parábola com concavidade voltada para cima e não intercepta o eixo x, pode-se afirmar que:',
       options: ['a > 0 e delta < 0', 'a < 0 e delta > 0', 'a > 0 e delta > 0', 'a < 0 e delta < 0'],
@@ -18,7 +18,7 @@ async function main() {
       description: 'Se a concavidade é para cima, o coeficiente "a" deve ser positivo (a > 0). Se não intercepta o eixo x, a equação não possui raízes reais, o que significa que o discriminante (delta) deve ser negativo (delta < 0).'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Em uma progressão aritmética (PA), o primeiro termo é 4 e a razão é 7. Qual é o valor do 10º termo dessa sequência?',
       options: ['63', '67', '71', '74'],
@@ -26,7 +26,7 @@ async function main() {
       description: 'A fórmula do termo geral da PA é an = a1 + (n - 1) * r. Substituindo os valores: a10 = 4 + (10 - 1) * 7 = 4 + 9 * 7 = 4 + 63 = 67.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Qual é a probabilidade de se obter um número primo ao lançar um dado justo de 6 faces?',
       options: ['1/6', '1/3', '1/2', '2/3'],
@@ -34,7 +34,7 @@ async function main() {
       description: 'Os números primos em um dado de 6 faces são 2, 3 e 5. Portanto, são 3 casos favoráveis em um total de 6 faces. Probabilidade = 3/6 = 1/2.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'O valor de log₂ (32) é igual a:',
       options: ['3', '4', '5', '6'],
@@ -42,7 +42,7 @@ async function main() {
       description: 'O logaritmo de 32 na base 2 é o expoente ao qual devemos elevar 2 para obter 32. Como 2⁵ = 32, o resultado é 5.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Se a base de um triângulo aumenta 10% e sua altura diminui 10%, a área do triângulo:',
       options: ['Permanece a mesma', 'Aumenta 1%', 'Diminui 1%', 'Diminui 5%'],
@@ -50,7 +50,7 @@ async function main() {
       description: 'A área original é (B * H) / 2. A nova área é (1.1B * 0.9H) / 2 = 0.99 * (B * H) / 2. Isso representa uma redução de 1% (100% - 99%).'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Quantos anagramas possui a palavra "SIMA"?',
       options: ['4', '12', '24', '48'],
@@ -58,7 +58,7 @@ async function main() {
       description: 'A palavra SIMA possui 4 letras distintas. O número de anagramas é a permutação de 4 (4!): 4 * 3 * 2 * 1 = 24.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Em um sistema de coordenadas, o ponto (3, -4) pertence a qual quadrante?',
       options: ['1º Quadrante', '2º Quadrante', '3º Quadrante', '4º Quadrante'],
@@ -66,7 +66,7 @@ async function main() {
       description: 'No 4º quadrante, os valores de x são positivos e os valores de y são negativos.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Qual o valor do determinante da matriz [[2, 3], [1, 5]]?',
       options: ['7', '10', '13', '17'],
@@ -74,7 +74,7 @@ async function main() {
       description: 'O determinante de uma matriz 2x2 [[a, b], [c, d]] é (ad - bc). Então: (2*5 - 3*1) = 10 - 3 = 7.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Um capital de R$ 1.000,00 aplicado a juros simples de 2% ao mês, após 5 meses, resultará em um montante de:',
       options: ['R$ 1.100,00', 'R$ 1.050,00', 'R$ 1.200,00', 'R$ 1.120,00'],
@@ -82,7 +82,7 @@ async function main() {
       description: 'Juros = C * i * t = 1000 * 0.02 * 5 = 100. Montante = Capital + Juros = 1000 + 100 = 1100.'
     },
     {
-      category: 'MATEMATICA_LOGICA',
+      category: 'MATEMATICA',
       grade: 12,
       text: 'Se todos os A são B e algum C é A, então podemos concluir que:',
       options: ['Todo C é B', 'Algum C é B', 'Nenhum C é B', 'Algum B não é A'],
@@ -103,11 +103,9 @@ async function main() {
       category: 'PORTUGUES',
       grade: 12,
       text: 'Qual das alternativas abaixo apresenta erro de concordância nominal?',
-      options: ['Elas mesmas fizeram o trabalho.', 'É proibida a entrada de estranhos.', 'Seguem anexos os documentos.', 'A comida estava meio estragada.'],
-      correctAnswer: 1,
-      description: 'O correto seria "É proibida a entrada" (com artigo) ou "É proibido entrada" (sem artigo). A frase "É proibida a entrada" está correta, mas se fosse "entrada" apenas seria proibido. Reanalisando: Todas parecem corretas. Vamos trocar a errada: "Seguem anexo os documentos" seria o erro comum (deve ser anexos).',
       options: ['Elas mesmos fizeram o trabalho.', 'É proibida a entrada.', 'Seguem anexos os documentos.', 'A comida estava meio estragada.'],
-      correctAnswer: 0, // "Elas mesmas" seria o correto
+      correctAnswer: 0,
+      description: 'O correto seria "Elas mesmas fizeram o trabalho".'
     },
     {
       category: 'PORTUGUES',
@@ -174,9 +172,9 @@ async function main() {
       description: '"Estudasse" está no Pretérito Imperfeito do Subjuntivo, indicando uma condição hipotética.'
     },
 
-    // CIENCIAS_BIOLOGICAS (10)
+    // CIENCIAS BIOLOGICAS (10)
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Na genética, um indivíduo que possui dois alelos iguais para uma mesma característica é chamado de:',
       options: ['Heterozigoto', 'Hemizigoto', 'Homozigoto', 'Híbrido'],
@@ -184,7 +182,7 @@ async function main() {
       description: 'Indivíduos homozigotos possuem pares de alelos idênticos (ex: AA ou aa) para um determinado gene.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Qual organela celular é responsável pela respiração celular e produção de ATP?',
       options: ['Ribossomo', 'Lisossomo', 'Mitocôndria', 'Complexo de Golgi'],
@@ -192,7 +190,7 @@ async function main() {
       description: 'As mitocôndrias são as "usinas de energia" da célula, onde ocorre a respiração celular aeróbica.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'O processo de divisão celular que resulta em quatro células-filhas com metade do número de cromossomos da célula-mãe é a:',
       options: ['Mitose', 'Meiose', 'Fissão Binária', 'Brotamento'],
@@ -200,7 +198,7 @@ async function main() {
       description: 'A meiose é uma divisão reducional essencial para a formação de gametas, garantindo a constância do número de cromossomos da espécie após a fecundação.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'No sistema circulatório humano, o sangue rico em oxigênio (arterial) entra no coração pelo:',
       options: ['Átrio Direito', 'Ventrículo Direito', 'Átrio Esquerdo', 'Ventrículo Esquerdo'],
@@ -208,7 +206,7 @@ async function main() {
       description: 'O sangue oxigenado vem dos pulmões pelas veias pulmonares e entra no átrio esquerdo do coração.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'A Teoria da Evolução proposta por Charles Darwin baseia-se principalmente no mecanismo de:',
       options: ['Uso e Desuso', 'Seleção Natural', 'Transmissão de caracteres adquiridos', 'Mutação induzida'],
@@ -216,7 +214,7 @@ async function main() {
       description: 'A seleção natural propõe que os indivíduos mais aptos ao ambiente têm maior probabilidade de sobreviver e se reproduzir, passando suas características adiante.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Qual o principal gás responsável pelo efeito estufa gerado por atividades humanas?',
       options: ['Oxigênio', 'Nitrogênio', 'Dióxido de Carbono (CO₂)', 'Hélio'],
@@ -224,7 +222,7 @@ async function main() {
       description: 'O CO₂ é o principal gás emitido pela queima de combustíveis fósseis e desmatamento, intensificando o efeito estufa.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Os fungos são organismos:',
       options: ['Autótrofos', 'Heterótrofos por absorção', 'Procariontes', 'Fotossintetizantes'],
@@ -232,7 +230,7 @@ async function main() {
       description: 'Fungos não produzem seu próprio alimento (heterótrofos) e obtêm nutrientes absorvendo moléculas orgânicas do ambiente.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Qual a função dos glóbulos brancos (leucócitos) no sangue?',
       options: ['Transporte de oxigênio', 'Coagulação sanguínea', 'Defesa do organismo', 'Transporte de nutrientes'],
@@ -240,7 +238,7 @@ async function main() {
       description: 'Os leucócitos são células do sistema imunológico responsáveis por combater agentes invasores como bactérias e vírus.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'Na cadeia alimentar, os organismos que transformam matéria orgânica morta em sais minerais são os:',
       options: ['Produtores', 'Consumidores Primários', 'Decompositores', 'Consumidores Terciários'],
@@ -248,7 +246,7 @@ async function main() {
       description: 'Decompositores (fungos e bactérias) fecham o ciclo da matéria, devolvendo nutrientes ao solo.'
     },
     {
-      category: 'CIENCIAS_BIOLOGICAS',
+      category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
       text: 'O DNA é composto por bases nitrogenadas. Qual base se emparelha sempre com a Citosina?',
       options: ['Adenina', 'Timina', 'Guanina', 'Uracila'],
@@ -339,12 +337,12 @@ async function main() {
     },
   ];
 
-  console.log(`Inserindo ${questions.length} questões reais de nível 3º ano do Ensino Médio...`);
+  console.log(`Inserindo ${questions.length} questões com categorias corrigidas...`);
   for (const q of questions) {
     await prisma.question.create({ data: q });
   }
 
-  console.log('Seed finalizado com sucesso!');
+  console.log('✅ Seed finalizado com sucesso!');
 }
 
 main()
