@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School } from "lucide-react";
+import Link from "next/link";
+import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School, LayoutDashboard } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Area, AreaChart as ReAreaChart
 } from 'recharts';
