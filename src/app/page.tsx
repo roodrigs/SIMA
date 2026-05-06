@@ -300,18 +300,26 @@ export default function SIMAApp() {
                 )}
                 
                 {categories.indexOf(activeTab) !== categories.length - 1 ? (
-                  <button onClick={() => setActiveTab(categories[categories.indexOf(activeTab) + 1])} className="flex-[2] h-14 bg-white/10 rounded-2xl font-black text-white hover:bg-white/20 transition-all uppercase text-xs tracking-widest">
-                    Próximo
+                  <button onClick={() => setActiveTab(categories[categories.indexOf(activeTab) + 1])} className="flex-[3] h-14 bg-white/10 rounded-2xl font-black text-white hover:bg-white/20 transition-all uppercase text-xs tracking-widest">
+                    Próxima Matéria
                   </button>
                 ) : (
-                  <div className="flex-[2] flex items-center justify-center">
-                    <span className="text-success-500 font-black text-[10px] tracking-widest uppercase animate-pulse">Finalizar Matéria</span>
-                  </div>
+                  <button 
+                    onClick={() => {
+                      if (confirm("Deseja realmente finalizar a avaliação? Certifique-se de ter respondido todas as questões.")) {
+                        handleSubmit();
+                      }
+                    }} 
+                    disabled={answeredCount === 0 || isSubmitting} 
+                    className="flex-[3] h-14 bg-primary-500 rounded-2xl flex items-center justify-center gap-3 text-white shadow-lg shadow-primary-500/40 disabled:opacity-20 hover:bg-primary-400 transition-all font-black uppercase text-xs tracking-widest"
+                  >
+                    {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : (
+                      <>
+                        Finalizar Avaliação <Send size={18} />
+                      </>
+                    )}
+                  </button>
                 )}
-
-                <button onClick={handleSubmit} disabled={answeredCount === 0 || isSubmitting} className="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-500/40 disabled:opacity-20 hover:bg-primary-400 transition-all shrink-0">
-                  {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
-                </button>
              </footer>
           </div>
         ) : (
