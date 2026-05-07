@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         text: q.text,
         options: q.options,
         correctAnswer: q.correctAnswer,
-        description: `A alternativa correta é a baseada nos fundamentos de ${q.category.toLowerCase()}.`
+        description: q.description // Usa a descrição real do banco
       });
     });
 

@@ -2,13 +2,13 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Limpando banco de dados para correção de categorias...');
+  console.log('Limpando banco de dados para nova carga de questões (30 por matéria)...');
   await prisma.answer.deleteMany({});
   await prisma.assessment.deleteMany({});
   await prisma.question.deleteMany({});
 
   const questions = [
-    // MATEMATICA (10)
+    // --- MATEMATICA (10 Originais + 20 Novas = 30) ---
     {
       category: 'MATEMATICA',
       grade: 12,
@@ -89,8 +89,169 @@ async function main() {
       correctAnswer: 1,
       description: 'Se algum C é A, e todo A é B, então esse "C que é A" obrigatoriamente também é B. Logo, algum C é B.'
     },
+    // MATEMATICA - NOVAS (20)
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual o volume de uma esfera de raio 3 cm? (Considere pi = 3)',
+      options: ['36 cm³', '108 cm³', '27 cm³', '81 cm³'],
+      correctAnswer: 1,
+      description: 'A fórmula do volume da esfera é V = (4/3) * pi * r³. Com r=3 e pi=3: V = (4/3) * 3 * 3³ = 4 * 27 = 108 cm³.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Em um triângulo retângulo, se os catetos medem 6 e 8, qual a medida da hipotenusa?',
+      options: ['10', '12', '14', '16'],
+      correctAnswer: 0,
+      description: 'Pelo Teorema de Pitágoras: h² = 6² + 8² = 36 + 64 = 100. Logo, h = raiz(100) = 10.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual é o valor de cos(60°)?',
+      options: ['1/2', 'raiz(3)/2', 'raiz(2)/2', '1'],
+      correctAnswer: 0,
+      description: 'De acordo com a tabela de razões trigonométricas dos ângulos notáveis, o cosseno de 60 graus é exatamente 0,5 ou 1/2.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'A média aritmética de cinco números é 20. Se retirarmos o número 12, qual será a nova média?',
+      options: ['18', '20', '22', '24'],
+      correctAnswer: 2,
+      description: 'A soma original é 5 * 20 = 100. Retirando 12, a nova soma é 88. Dividindo pelos 4 números restantes: 88 / 4 = 22.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual a distância entre os pontos A(1, 2) e B(4, 6) no plano cartesiano?',
+      options: ['3', '4', '5', '7'],
+      correctAnswer: 2,
+      description: 'A fórmula da distância é d = raiz((x2-x1)² + (y2-y1)²). d = raiz((4-1)² + (6-2)²) = raiz(3² + 4²) = raiz(9 + 16) = raiz(25) = 5.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'O que representa o coeficiente linear "b" em uma função do 1º grau f(x) = ax + b?',
+      options: ['A inclinação da reta', 'O ponto onde a reta cruza o eixo y', 'A raiz da função', 'O ponto onde a reta cruza o eixo x'],
+      correctAnswer: 1,
+      description: 'O coeficiente linear "b" indica o valor de f(0), ou seja, a ordenada do ponto de interseção da reta com o eixo vertical (y).'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Quantas comissões de 3 pessoas podem ser formadas a partir de um grupo de 5 pessoas?',
+      options: ['10', '15', '20', '60'],
+      correctAnswer: 0,
+      description: 'Trata-se de uma combinação (a ordem não importa): C(5,3) = 5! / (3! * 2!) = (5 * 4 * 3!) / (3! * 2) = 20 / 2 = 10.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual o valor de x na equação 3^(x+1) = 27?',
+      options: ['1', '2', '3', '4'],
+      correctAnswer: 1,
+      description: 'Como 27 = 3³, temos 3^(x+1) = 3³. Igualando os expoentes: x + 1 = 3, logo x = 2.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Uma aplicação de R$ 500,00 a juros compostos de 10% ao mês, após 2 meses, resulta em qual montante?',
+      options: ['R$ 600,00', 'R$ 605,00', 'R$ 550,00', 'R$ 610,00'],
+      correctAnswer: 1,
+      description: 'M = C * (1 + i)^t. M = 500 * (1.1)² = 500 * 1.21 = 605. No primeiro mês vai para 550, e no segundo 10% sobre 550 é 55, totalizando 605.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual a área de um círculo com diâmetro de 10 cm? (Considere pi = 3,14)',
+      options: ['31,4 cm²', '78,5 cm²', '314 cm²', '100 cm²'],
+      correctAnswer: 1,
+      description: 'Se o diâmetro é 10, o raio r é 5. A área é A = pi * r² = 3,14 * 5² = 3,14 * 25 = 78,5 cm².'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Em uma PG, o primeiro termo é 2 e a razão é 3. Qual o quarto termo?',
+      options: ['18', '24', '54', '162'],
+      correctAnswer: 2,
+      description: 'an = a1 * q^(n-1). a4 = 2 * 3^(4-1) = 2 * 3³ = 2 * 27 = 54.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual o valor de x que satisfaz a equação log(x) + log(2) = log(10)?',
+      options: ['2', '5', '8', '12'],
+      correctAnswer: 1,
+      description: 'Usando a propriedade da soma de logaritmos: log(2x) = log(10). Portanto, 2x = 10, o que resulta em x = 5.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual a soma das raízes da equação x² - 5x + 6 = 0?',
+      options: ['-5', '5', '6', '-6'],
+      correctAnswer: 1,
+      description: 'Pelas relações de Girard, a soma das raízes de ax² + bx + c = 0 é dada por -b/a. Aqui, -(-5)/1 = 5.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Um polígono regular tem ângulos internos de 120°. Quantos lados tem esse polígono?',
+      options: ['4', '5', '6', '8'],
+      correctAnswer: 2,
+      description: 'O ângulo externo é 180° - 120° = 60°. A soma dos ângulos externos é sempre 360°. O número de lados n = 360 / 60 = 6 (Hexágono).'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual o valor da expressão sen²(x) + cos²(x)?',
+      options: ['0', '1', '2', 'Depende de x'],
+      correctAnswer: 1,
+      description: 'Esta é a Relação Fundamental da Trigonometria, que afirma que para qualquer ângulo x, a soma dos quadrados do seno e do cosseno é sempre igual a 1.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Se f(x) = 2x + 3, qual o valor da função inversa f⁻¹(7)?',
+      options: ['2', '5', '17', '1/2'],
+      correctAnswer: 0,
+      description: 'Queremos encontrar x tal que f(x) = 7. Então 2x + 3 = 7 => 2x = 4 => x = 2. Portanto f⁻¹(7) = 2.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Em um lançamento de dois dados, qual a probabilidade da soma ser 7?',
+      options: ['1/6', '1/12', '1/36', '5/36'],
+      correctAnswer: 0,
+      description: 'Os pares que somam 7 são: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1). São 6 casos favoráveis em 36 totais. 6/36 = 1/6.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual a derivada da função f(x) = x³?',
+      options: ['x²', '2x', '3x²', '3x'],
+      correctAnswer: 2,
+      description: 'Pela regra do tombo (ou regra da potência), a derivada de x^n é n * x^(n-1). Para n=3, temos 3x².'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'Qual o valor de 2 + 2 * 2?',
+      options: ['8', '4', '6', '2'],
+      correctAnswer: 2,
+      description: 'Pela ordem de precedência das operações matemáticas, a multiplicação deve ser realizada antes da adição: 2 + (2 * 2) = 2 + 4 = 6.'
+    },
+    {
+      category: 'MATEMATICA',
+      grade: 12,
+      text: 'O que é um número irracional?',
+      options: ['Número que pode ser escrito como fração', 'Número que não pode ser escrito como fração de inteiros', 'Número negativo', 'Número primo'],
+      correctAnswer: 1,
+      description: 'Números irracionais são aqueles que possuem representação decimal infinita e não periódica, como pi ou raiz(2), impossibilitando sua escrita como razão de dois inteiros.'
+    },
 
-    // PORTUGUES (10)
+    // --- PORTUGUES (10 Originais + 20 Novas = 30) ---
     {
       category: 'PORTUGUES',
       grade: 12,
@@ -171,8 +332,169 @@ async function main() {
       correctAnswer: 0,
       description: '"Estudasse" está no Pretérito Imperfeito do Subjuntivo, indicando uma condição hipotética.'
     },
+    // PORTUGUES - NOVAS (20)
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Assinale a alternativa que apresenta uma figura de linguagem chamada Hipérbole:',
+      options: ['O sol beijava o mar.', 'Morri de rir com aquela história.', 'Ele é um doce de pessoa.', 'O carro voava pelas ruas.'],
+      correctAnswer: 1,
+      description: 'Hipérbole é a figura de linguagem que consiste no exagero intencional para dar ênfase, como em "morri de rir".'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Em qual das frases o "porquê" está escrito corretamente?',
+      options: ['Não sei porque você se foi.', 'Você está rindo por que?', 'O porquê de tudo isso é o amor.', 'Eles viajaram porquê queriam.'],
+      correctAnswer: 2,
+      description: '"O porquê" (substantivado) é usado quando precedido de artigo, pronome ou numeral, significando "o motivo".'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual o principal objetivo do movimento literário chamado Arcadismo?',
+      options: ['Exaltar a vida urbana', 'Valorizar a vida bucólica e a natureza', 'Explorar o subconsciente', 'Criticar a burguesia'],
+      correctAnswer: 1,
+      description: 'O Arcadismo buscava a simplicidade, o equilíbrio e o retorno à natureza (fugere urbem), inspirando-se nos modelos clássicos e na vida pastoril.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'A obra "Memórias Póstumas de Brás Cubas" marca o início de qual movimento no Brasil?',
+      options: ['Romantismo', 'Realismo', 'Naturalismo', 'Modernismo'],
+      correctAnswer: 1,
+      description: 'Publicada em 1881 por Machado de Assis, esta obra inaugurou o Realismo brasileiro com sua análise psicológica e ironia mordaz.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Assinale a opção em que a regência verbal está INCORRETA:',
+      options: ['Assisti ao filme ontem.', 'Chegamos no colégio cedo.', 'Esqueci o nome dele.', 'Visamos ao sucesso.'],
+      correctAnswer: 1,
+      description: 'O verbo "chegar" rege a preposição "a". O correto, segundo a norma culta, seria "Chegamos ao colégio".'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'O que caracteriza a função Metalinguística da linguagem?',
+      options: ['O foco na emoção do emissor', 'O uso do código para explicar o próprio código', 'O foco no receptor', 'O foco no canal'],
+      correctAnswer: 1,
+      description: 'A metalinguagem ocorre quando a linguagem fala dela mesma, como um dicionário definindo palavras ou um poema sobre o ato de escrever.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'No Romantismo, a "Geração Condoreira" tinha como principal temática:',
+      options: ['O amor platônico', 'O nacionalismo ufanista', 'A luta social e abolicionista', 'A morte e o pessimismo'],
+      correctAnswer: 2,
+      description: 'A 3ª geração romântica, liderada por Castro Alves, focava em questões sociais, especialmente na defesa da abolição da escravidão.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual a classe gramatical da palavra destacada: "Ele agiu MUITO mal"?',
+      options: ['Adjetivo', 'Pronome', 'Advérbio', 'Conjunção'],
+      correctAnswer: 2,
+      description: '"Muito" está modificando o advérbio "mal", intensificando seu sentido, logo funciona como um advérbio de intensidade.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual o significado de "Ambiguidade"?',
+      options: ['Uso de palavras difíceis', 'Presença de mais de um sentido em uma frase', 'Erro de ortografia', 'Repetição de sons'],
+      correctAnswer: 1,
+      description: 'Ambiguidade é a propriedade de um termo ou enunciado apresentar múltiplos sentidos, muitas vezes causando confusão na interpretação.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Assinale a frase com o uso correto da pontuação:',
+      options: ['Maria, comprou pão.', 'Eu gosto de doces, ela de salgados.', 'O aluno, estudou muito para a prova.', 'Ontem eu, fui ao cinema.'],
+      correctAnswer: 1,
+      description: 'Nesta frase, a vírgula indica a omissão do verbo "gostar" na segunda oração (zeugma), o que está correto. Nas outras, separa-se incorretamente o sujeito do verbo.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Quem escreveu "A Hora da Estrela"?',
+      options: ['Rachel de Queiroz', 'Cecília Meireles', 'Clarice Lispector', 'Lygia Fagundes Telles'],
+      correctAnswer: 2,
+      description: 'Clarice Lispector é a autora desta obra, que narra a história da retirante nordestina Macabéa no Rio de Janeiro.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'O que é um "Texto Dissertativo-Argumentativo"?',
+      options: ['Um texto que conta uma história', 'Um texto que descreve uma cena', 'Um texto que defende um ponto de vista com argumentos', 'Um texto poético'],
+      correctAnswer: 2,
+      description: 'É o gênero exigido no ENEM, onde o autor deve expor um tema e defender uma tese através de argumentos lógicos e provas.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual destas palavras é um exemplo de Neologismo?',
+      options: ['Casa', 'Deletar', 'Janela', 'Livro'],
+      correctAnswer: 1,
+      description: 'Neologismo é a criação de uma nova palavra ou atribuição de novo sentido a uma já existente. "Deletar" veio do inglês "delete" e foi incorporado ao português.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'O prefixo "An-" em "Analfabeto" e "Anarquia" indica:',
+      options: ['Repetição', 'Aproximação', 'Negação/Privação', 'Superioridade'],
+      correctAnswer: 2,
+      description: 'O prefixo grego "an-" (ou "a-") indica negação, ausência ou privação de algo.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Assinale a alternativa que contém apenas substantivos abstratos:',
+      options: ['Amor, beleza, tristeza', 'Mesa, cadeira, lápis', 'Fada, duende, deus', 'Brasil, Pedro, Totó'],
+      correctAnswer: 0,
+      description: 'Substantivos abstratos designam ações, estados, qualidades ou sentimentos que dependem de um ser para existir.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual a principal característica do Naturalismo?',
+      options: ['Idealização da mulher', 'Análise do homem como produto do meio e da hereditariedade', 'Busca pela perfeição formal', 'Foco no eu lírico'],
+      correctAnswer: 1,
+      description: 'O Naturalismo radicaliza o Realismo, usando um olhar "científico" para mostrar o lado mais animalesco e patológico do ser humano.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Na frase "Faz dois anos que não o vejo", o verbo fazer indica:',
+      options: ['Ação do sujeito', 'Tempo decorrido', 'Clima', 'Desejo'],
+      correctAnswer: 1,
+      description: 'O verbo "fazer", quando indica tempo decorrido, é impessoal e deve permanecer sempre na 3ª pessoa do singular.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'O que é Eufemismo?',
+      options: ['Suavização de uma expressão desagradável', 'Exagero de uma ideia', 'Comparação direta', 'Repetição de palavras'],
+      correctAnswer: 0,
+      description: 'Eufemismo é usar termos mais leves para evitar palavras chocantes ou tristes, como "partiu desta para melhor" em vez de "morreu".'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'A conjunção "PORÉM" estabelece uma relação de:',
+      options: ['Causa', 'Explicação', 'Adição', 'Oposição'],
+      correctAnswer: 3,
+      description: '"Porém" é uma conjunção adversativa, usada para introduzir uma ideia que contrasta com o que foi dito anteriormente.'
+    },
+    {
+      category: 'PORTUGUES',
+      grade: 12,
+      text: 'Qual movimento literário valorizava a "Arte pela Arte" e o rigor formal?',
+      options: ['Parnasianismo', 'Simbolismo', 'Modernismo', 'Romantismo'],
+      correctAnswer: 0,
+      description: 'Os parnasianos buscavam a perfeição técnica, rimas ricas e objetividade, opondo-se ao sentimentalismo romântico.'
+    },
 
-    // CIENCIAS BIOLOGICAS (10)
+    // --- CIENCIAS BIOLOGICAS (10 Originais + 20 Novas = 30) ---
     {
       category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
@@ -192,7 +514,7 @@ async function main() {
     {
       category: 'CIENCIAS BIOLOGICAS',
       grade: 12,
-      text: 'O processo de divisão celular que resulta em quatro células-filhas com metade do número de cromossomos da célula-mãe é a:',
+      text: 'O processo de division celular que resulta em quatro células-filhas com metade do número de cromossomos da célula-mãe é a:',
       options: ['Mitose', 'Meiose', 'Fissão Binária', 'Brotamento'],
       correctAnswer: 1,
       description: 'A meiose é uma divisão reducional essencial para a formação de gametas, garantindo a constância do número de cromossomos da espécie após a fecundação.'
@@ -253,8 +575,169 @@ async function main() {
       correctAnswer: 2,
       description: 'No DNA, a Citosina (C) sempre se liga à Guanina (G), e a Adenina (A) à Timina (T).'
     },
+    // CIENCIAS BIOLOGICAS - NOVAS (20)
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual a principal diferença entre células procariontes e eucariontes?',
+      options: ['Presença de parede celular', 'Presença de membrana plasmática', 'Presença de núcleo delimitado por carioteca', 'Presença de ribossomos'],
+      correctAnswer: 2,
+      description: 'Células eucariontes possuem o material genético isolado por uma membrana (carioteca), formando um núcleo, enquanto nas procariontes o DNA fica livre no citoplasma.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O que define uma relação ecológica do tipo Mutualismo?',
+      options: ['Um se beneficia e o outro é prejudicado', 'Ambos se beneficiam e a relação é obrigatória para sobrevivência', 'Ambos se beneficiam mas podem viver separados', 'Apenas um se beneficia sem afetar o outro'],
+      correctAnswer: 1,
+      description: 'No mutualismo, a interação traz benefícios para ambas as espécies envolvidas e é essencial para a manutenção de suas vidas (ex: líquens).'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'As plantas briófitas (como os musgos) caracterizam-se por:',
+      options: ['Possuir vasos condutores de seiva', 'Produzir sementes e frutos', 'Serem avasculares e dependerem da água para reprodução', 'Terem flores exuberantes'],
+      correctAnswer: 2,
+      description: 'As briófitas são plantas simples, de pequeno porte, que não possuem vasos condutores (xilema/floema) e cujos gametas precisam de água para se encontrar.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual hormônio é responsável por reduzir os níveis de glicose no sangue?',
+      options: ['Glucagon', 'Adrenalina', 'Insulina', 'Cortisol'],
+      correctAnswer: 2,
+      description: 'A insulina, produzida pelo pâncreas, facilita a entrada da glicose nas células, diminuindo sua concentração na corrente sanguínea.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O que são órgãos análogos na evolução?',
+      options: ['Órgãos com mesma origem embrionária', 'Órgãos com funções parecidas mas origens diferentes', 'Órgãos que não servem para nada', 'Órgãos idênticos em espécies iguais'],
+      correctAnswer: 1,
+      description: 'Órgãos análogos resultam da convergência evolutiva, onde espécies diferentes desenvolvem estruturas para a mesma função (ex: asas de aves e de insetos) sem parentesco direto.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual o principal bioma brasileiro caracterizado por solo ácido e árvores de troncos tortuosos?',
+      options: ['Amazônia', 'Cerrado', 'Caatinga', 'Pantanal'],
+      correctAnswer: 1,
+      description: 'O Cerrado possui solos com alta concentração de alumínio (ácidos) e vegetação adaptada com cascas grossas e raízes profundas.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'No processo de fotossíntese, em qual organela ocorre a conversão de energia luminosa em química?',
+      options: ['Mitocôndria', 'Cloroplasto', 'Vacúolo', 'Núcleo'],
+      correctAnswer: 1,
+      description: 'Os cloroplastos contêm clorofila, pigmento capaz de captar a luz solar para realizar a síntese de matéria orgânica.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual a função das plaquetas no sangue?',
+      options: ['Combater infecções', 'Transportar oxigênio', 'Atuar na coagulação sanguínea', 'Limpar o plasma'],
+      correctAnswer: 2,
+      description: 'As plaquetas (trombócitos) são fragmentos celulares que se agrupam para estancar sangramentos e iniciar a cicatrização de feridas.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Um vírus é considerado um parasita intracelular obrigatório porque:',
+      options: ['É muito grande', 'Só sobrevive fora das células', 'Não possui metabolismo próprio fora de uma célula hospedeira', 'Tem DNA e RNA ao mesmo tempo'],
+      correctAnswer: 2,
+      description: 'Vírus não possuem maquinário celular (ribossomos, enzimas) para se reproduzir sozinhos, precisando "sequestrar" o sistema de uma célula viva.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'A tradução gênica, processo de síntese de proteínas, ocorre no:',
+      options: ['Núcleo', 'Ribossomo', 'Lisossomo', 'Complexo de Golgi'],
+      correctAnswer: 1,
+      description: 'A tradução acontece quando o RNA mensageiro é lido pelos ribossomos no citoplasma, orientando a sequência de aminoácidos da proteína.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual a principal excreta nitrogenada dos mamíferos?',
+      options: ['Amônia', 'Ácido Úrico', 'Ureia', 'Gás Carbônico'],
+      correctAnswer: 2,
+      description: 'Mamíferos transformam a amônia (tóxica) em ureia no fígado, que é menos tóxica e solúvel em água, facilitando a excreção pelos rins.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O que caracteriza a Sucessão Ecológica Primária?',
+      options: ['Ocorre em locais onde já havia vida', 'Ocorre em áreas virgens, como rochas nuas ou lavas vulcânicas', 'É o fim de uma comunidade', 'Ocorre após um incêndio florestal'],
+      correctAnswer: 1,
+      description: 'A sucessão primária inicia-se em ambientes onde nunca houve vida anteriormente, começando com organismos pioneiros como líquens.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual o papel dos decompositores no ciclo do nitrogênio?',
+      options: ['Fixar nitrogênio do ar', 'Transformar matéria orgânica em amônia', 'Converter nitrato em gás nitrogênio', 'Absorver nitrogênio pelas raízes'],
+      correctAnswer: 1,
+      description: 'Bactérias e fungos decompositores degradam restos orgânicos, liberando nitrogênio na forma de amônia para o solo (amonificação).'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'A técnica de PCR (Reação em Cadeia da Polimerase) serve para:',
+      options: ['Cortar o DNA', 'Mapear proteínas', 'Amplificar (fazer cópias) de segmentos específicos de DNA', 'Unir dois DNAs diferentes'],
+      correctAnswer: 2,
+      description: 'A PCR permite produzir milhões de cópias de uma pequena amostra de DNA, sendo fundamental em testes de paternidade, perícias criminais e diagnóstico de doenças.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O que são animais hermafroditas (monoicos)?',
+      options: ['Animais que não se reproduzem', 'Animais que possuem apenas órgãos masculinos', 'Animais que possuem ambos os sistemas reprodutores (masculino e feminino)', 'Animais que mudam de sexo'],
+      correctAnswer: 2,
+      description: 'Organismos monoicos produzem tanto gametas masculinos quanto femininos no mesmo indivíduo (ex: minhocas).'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual vitamina é sintetizada na pele humana através da exposição solar?',
+      options: ['Vitamina A', 'Vitamina C', 'Vitamina D', 'Vitamina K'],
+      correctAnswer: 2,
+      description: 'A radiação ultravioleta B (UVB) é necessária para converter o precursor do colesterol na pele em vitamina D ativa, essencial para os ossos.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O sistema nervoso autônomo Simpático é responsável por:',
+      options: ['Relaxamento e digestão', 'Ações de "luta ou fuga", como aumento dos batimentos cardíacos', 'Pensamento consciente', 'Coordenação motora fina'],
+      correctAnswer: 1,
+      description: 'O sistema simpático prepara o corpo para situações de estresse ou emergência, liberando adrenalina e acelerando o metabolismo.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual a função da clorofila nas plantas?',
+      options: ['Dar sustentação ao caule', 'Absorver luz para a fotossíntese', 'Transportar água', 'Atrair insetos'],
+      correctAnswer: 1,
+      description: 'A clorofila é o pigmento verde que capta a energia dos fótons da luz solar para iniciar a fase clara da fotossíntese.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'O que é a Biorremediação?',
+      options: ['Uso de remédios naturais', 'Uso de microrganismos para limpar áreas contaminadas', 'Destruição de pragas com veneno', 'Reflorestamento com árvores exóticas'],
+      correctAnswer: 1,
+      description: 'A biorremediação utiliza o metabolismo de bactérias ou fungos para degradar poluentes (como óleo ou metais pesados) no solo ou na água.'
+    },
+    {
+      category: 'CIENCIAS BIOLOGICAS',
+      grade: 12,
+      text: 'Qual a principal função do intestino grosso?',
+      options: ['Digestão de proteínas', 'Absorção de água e formação das fezes', 'Produção de bile', 'Absorção da maior parte dos nutrientes'],
+      correctAnswer: 1,
+      description: 'Enquanto o intestino delgado absorve nutrientes, o grosso foca em reabsorver água e sais, compactando os resíduos não digeridos.'
+    },
 
-    // HISTORIA (10)
+    // --- HISTORIA (10 Originais + 20 Novas = 30) ---
     {
       category: 'HISTORIA',
       grade: 12,
@@ -335,15 +818,176 @@ async function main() {
       correctAnswer: 2,
       description: 'Dom Pedro I proclamou a independência em 7 de setembro de 1822, tornando-se o primeiro Imperador do Brasil.'
     },
+    // HISTORIA - NOVAS (20)
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que foi o "Coronelismo" na República Velha brasileira?',
+      options: ['Um movimento militar', 'O poder político exercido por grandes latifundiários locais', 'Uma escola de oficiais', 'Um sistema de impostos'],
+      correctAnswer: 1,
+      description: 'O coronelismo era baseado no controle de votos pelos grandes fazendeiros (coronéis) através do "voto de cabresto", sustentando a política dos governadores.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Qual civilização antiga construiu as Pirâmides de Gizé?',
+      options: ['Inca', 'Grega', 'Egípcia', 'Mesopotâmica'],
+      correctAnswer: 2,
+      description: 'As pirâmides foram construídas pelo Império Egípcio para servirem de tumbas monumentais para os faraós Quéops, Quéfren e Miquerinos.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O Iluminismo, movimento intelectual do século XVIII, defendia principalmente:',
+      options: ['O poder absoluto dos reis', 'A fé acima da razão', 'A razão, a liberdade e o progresso científico', 'A manutenção do sistema feudal'],
+      correctAnswer: 2,
+      description: 'O Iluminismo criticava o Antigo Regime e defendia que a razão humana era a ferramenta para combater a ignorância e a tirania.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Quem foi o líder da Revolução Cubana em 1959?',
+      options: ['Che Guevara', 'Fidel Castro', 'Hugo Chávez', 'Simón Bolívar'],
+      correctAnswer: 1,
+      description: 'Fidel Castro liderou o movimento guerrilheiro que derrubou a ditadura de Fulgencio Batista, instaurando um regime socialista em Cuba.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Qual foi o principal motivo para a entrada dos Estados Unidos na Segunda Guerra Mundial?',
+      options: ['O ataque a Pearl Harbor pelo Japão', 'A invasão da Polônia pela Alemanha', 'O bombardeio de Londres', 'A Revolução Russa'],
+      correctAnswer: 0,
+      description: 'Em 7 de dezembro de 1941, o Japão atacou a base naval dos EUA no Havaí, forçando o país a abandonar sua neutralidade no conflito.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O período da história brasileira entre 1964 e 1985 é caracterizado por:',
+      options: ['Democracia Plena', 'Ditadura Militar', 'Monarquia Parlamentarista', 'Anarquia'],
+      correctAnswer: 1,
+      description: 'Este período iniciou-se com o golpe que derrubou João Goulart e foi marcado pela censura, repressão política e centralização do poder nas mãos dos militares.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'A "Conferência de Berlim" (1884-1885) teve como objetivo:',
+      options: ['Acabar com a escravidão na Europa', 'Organizar a partilha do continente africano entre as potências europeias', 'Declarar guerra à Rússia', 'Fundar a ONU'],
+      correctAnswer: 1,
+      description: 'Nesta reunião, os países europeus definiram as fronteiras e regras para a ocupação e exploração da África, ignorando as populações locais.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Qual imperador romano oficializou o Cristianismo no Império através do Edito de Tessalônica?',
+      options: ['Júlio César', 'Nero', 'Constantino', 'Teodósio'],
+      correctAnswer: 3,
+      description: 'Embora Constantino tenha dado liberdade de culto, foi Teodósio quem tornou o Cristianismo a religião oficial do Estado Romano em 380 d.C.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que foi o "Renascimento" cultural e artístico?',
+      options: ['Uma volta aos valores da Idade Média', 'Um movimento de valorização da Antiguidade Clássica (Grécia e Roma)', 'A invenção do cinema', 'A descoberta da pólvora'],
+      correctAnswer: 1,
+      description: 'O Renascimento surgiu na Itália e colocava o homem no centro (antropocentrismo), buscando inspiração nas artes e filosofia greco-romanas.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Quem era o presidente do Brasil durante a construção de Brasília?',
+      options: ['Getúlio Vargas', 'Jânio Quadros', 'Juscelino Kubitschek', 'João Goulart'],
+      correctAnswer: 2,
+      description: 'JK cumpriu sua meta de "50 anos em 5", tendo a interiorização do país e a construção da nova capital como marcos de seu governo.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'A "Crise de 1929" começou com o colapso de qual instituição?',
+      options: ['Banco da Inglaterra', 'Bolsa de Valores de Nova York', 'Fundo Monetário Internacional', 'Banco Central do Brasil'],
+      correctAnswer: 1,
+      description: 'A quebra da Bolsa de Nova York (Quinta-Feira Negra) gerou uma depressão econômica mundial sem precedentes.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O Tratado de Tordesilhas dividia as terras descobertas entre quais países?',
+      options: ['Espanha e França', 'Portugal e Inglaterra', 'Portugal e Espanha', 'França e Holanda'],
+      correctAnswer: 2,
+      description: 'Assinado em 1494, o tratado definiu uma linha imaginária que repartia o "Novo Mundo" entre as duas potências ibéricas.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Qual filósofo é o autor de "O Manifesto Comunista"?',
+      options: ['Adam Smith', 'Immanuel Kant', 'Karl Marx e Friedrich Engels', 'Jean-Jacques Rousseau'],
+      correctAnswer: 2,
+      description: 'Marx e Engels escreveram o manifesto em 1848, lançando as bases do socialismo científico e da luta de classes.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que foi o "Apartheid" na África do Sul?',
+      options: ['Um festival de música', 'Um regime de segregação racial institucionalizada', 'Uma aliança militar', 'Um plano econômico'],
+      correctAnswer: 1,
+      description: 'O Apartheid foi um sistema legal que privilegiava a minoria branca e retirava direitos básicos da maioria negra, durando até os anos 90.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'A Guerra Fria foi uma disputa ideológica entre quais blocos?',
+      options: ['Eixo e Aliados', 'Capitalista (EUA) e Socialista (URSS)', 'Cristãos e Muçulmanos', 'Norte e Sul'],
+      correctAnswer: 1,
+      description: 'Após a 2ª Guerra, o mundo tornou-se bipolar, com EUA e URSS competindo por influência sem entrar em conflito armado direto.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Qual a principal característica do Absolutismo?',
+      options: ['Poder dividido em três poderes', 'Poder total e centralizado nas mãos do Rei', 'Eleições periódicas', 'Participação direta do povo'],
+      correctAnswer: 1,
+      description: 'No Absolutismo, o monarca possuía poder ilimitado, muitas vezes justificado pelo "Direito Divino dos Reis".'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que motivou as Cruzadas na Idade Média?',
+      options: ['Interesse em descobrir novas terras', 'A retomada da Terra Santa (Jerusalém) das mãos dos muçulmanos', 'A fuga da Peste Negra', 'A busca por ouro na América'],
+      correctAnswer: 1,
+      description: 'As Cruzadas foram expedições militares de caráter religioso convocadas pela Igreja Católica para reconquistar lugares sagrados no Oriente.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que foi a "Inconfidência Mineira" em 1789?',
+      options: ['Um festival de arte em Minas', 'Uma revolta separatista contra a cobrança excessiva de impostos por Portugal', 'Uma guerra entre mineradores', 'A fundação da cidade de Tiradentes'],
+      correctAnswer: 1,
+      description: 'Inspirada nos ideais iluministas, a revolta planejava a independência de Minas Gerais devido à "derrama" (cobrança de impostos atrasados).'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'Quem foi a primeira mulher a ser eleita Presidente do Brasil?',
+      options: ['Marina Silva', 'Dilma Rousseff', 'Simone Tebet', 'Zélia Cardoso de Mello'],
+      correctAnswer: 1,
+      description: 'Dilma Rousseff foi eleita em 2010 e reeleita em 2014, sendo a primeira mulher a ocupar o cargo máximo da República.'
+    },
+    {
+      category: 'HISTORIA',
+      grade: 12,
+      text: 'O que foi o "Holocausto"?',
+      options: ['Uma batalha naval', 'O genocídio de judeus e outros grupos pelo regime nazista', 'A descoberta da cura da pólio', 'Um acordo de paz'],
+      correctAnswer: 1,
+      description: 'O Holocausto foi a perseguição e o extermínio sistemático de cerca de 6 milhões de judeus, além de ciganos, homossexuais e dissidentes, pelos nazistas na 2ª Guerra.'
+    },
   ];
 
-  console.log(`Inserindo ${questions.length} questões com categorias corrigidas...`);
+  console.log(`Inserindo ${questions.length} questões (30 por categoria)...`);
   for (const q of questions) {
     await prisma.question.create({ data: q });
   }
 
-  console.log('✅ Seed finalizado com sucesso!');
-}
+  console.log('✅ Banco de dados populado com sucesso! Agora temos 30 questões por matéria com explicações reais.');
+  }
 
 main()
   .catch((e) => {
