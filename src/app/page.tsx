@@ -345,13 +345,7 @@ export default function SIMAApp() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="label-minimal">Turma</label>
-                  <select className="input-clean bg-white appearance-none" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})}>
-                    <option value="">Selecione</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                  </select>
+                  <input className="input-clean" placeholder="Ex: A, 101, etc" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} />
                 </div>
               </div>
               <div className="space-y-1.5">
