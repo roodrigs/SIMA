@@ -129,10 +129,18 @@ export async function GET() {
       stdDev: stdDev
     };
 
-    const classesData = Object.entries(classStats).map(([name, stats]) => ({
-      class: name,
-      score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
-    })).sort((a, b) => a.class.localeCompare(b.class));
+    const classesData = Object.entries(classStats).map(([name, stats]) => {
+      const parts = name.split(' - ');
+      const schoolName = parts[0];
+      const className = parts.slice(1).join(' - ');
+      
+      return {
+        class: className || name,
+        school: schoolName,
+        fullClass: name,
+        score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
+      };
+    }).sort((a, b) => a.fullClass.localeCompare(b.fullClass));
 
     // Geração de Diagnóstico da Turma
     const classDiagnostics = Object.entries(classStats).map(([name, stats]) => {
@@ -143,8 +151,18 @@ export async function GET() {
       else if (score >= 40) text = "Atenção necessária. Grande parte da turma apresenta dificuldades básicas.";
       else text = "Crítico. Necessário revisão completa dos fundamentos com a turma.";
       
-      return { class: name, score: Math.round(score), diagnostic: text };
-    }).sort((a, b) => a.class.localeCompare(b.class));
+      const parts = name.split(' - ');
+      const schoolName = parts[0];
+      const className = parts.slice(1).join(' - ');
+
+      return { 
+        class: className || name, 
+        school: schoolName,
+        fullClass: name,
+        score: Math.round(score), 
+        diagnostic: text 
+      };
+    }).sort((a, b) => a.fullClass.localeCompare(b.fullClass));
 
     // Lista individual de alunos para o relatório
     const studentsData = assessments.map(a => {

@@ -117,7 +117,15 @@ export default function AdminDashboard() {
       })),
       categories: rawData.categories, // Categorias são globais, mas poderiam ser filtradas por avaliação se necessário
       schools: Object.entries(schoolStats).map(([name, s]: any) => ({ school: name, score: Math.round((s.hits / s.total) * 100) })),
-      classes: Object.entries(classStats).map(([name, s]: any) => ({ class: name, score: Math.round((s.hits / s.total) * 100) })),
+      classes: Object.entries(classStats).map(([name, s]: any) => {
+        const parts = name.split(' - ');
+        return { 
+          class: parts.slice(1).join(' - ') || name, 
+          school: parts[0],
+          fullClass: name,
+          score: Math.round((s.hits / s.total) * 100) 
+        };
+      }).sort((a, b) => a.fullClass.localeCompare(b.fullClass)),
       grades: Object.entries(gradeStats).map(([name, s]: any) => ({ grade: name, score: Math.round((s.hits / s.total) * 100) })),
       zones: Object.entries(zoneStats).map(([name, s]: any) => ({ zone: name, score: Math.round((s.hits / s.total) * 100) })),
       schoolNetworks: Object.entries(schoolNetworkStats).map(([name, s]: any) => ({ schoolNetwork: name, score: Math.round((s.hits / s.total) * 100) }))
@@ -368,7 +376,13 @@ export default function AdminDashboard() {
                   <YAxis hide domain={[0, 100]} />
                   <Tooltip 
                     cursor={{fill: '#f8fafc'}} 
-                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}} 
+                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
+                    labelFormatter={(value, payload) => {
+                      if (payload && payload.length > 0) {
+                        return `${payload[0].payload.school} - ${value}`;
+                      }
+                      return value;
+                    }}
                   />
                   <Bar dataKey="score" radius={[8, 8, 8, 8]} barSize={40}>
                     {data.classes.map((entry: any, index: number) => (

@@ -15,13 +15,13 @@ export async function POST(request: Request) {
     const result = await prisma.$transaction(async (tx) => {
       const assessment = await tx.assessment.create({
         data: {
-          operatorName,
-          intervieweeName,
-          schoolName,
-          schoolClass,
+          operatorName: operatorName?.trim(),
+          intervieweeName: intervieweeName?.trim(),
+          schoolName: schoolName?.trim(),
+          schoolClass: schoolClass?.trim(),
           grade: parseInt(grade),
-          zone,
-          schoolNetwork,
+          zone: zone?.trim(),
+          schoolNetwork: schoolNetwork?.trim(),
           answers: {
             create: answers.map((a: any) => ({
               questionId: a.questionId,
