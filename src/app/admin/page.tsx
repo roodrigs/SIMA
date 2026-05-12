@@ -81,9 +81,10 @@ export default function AdminDashboard() {
       schoolStats[s.school].hits += s.hits;
       schoolStats[s.school].total += total;
 
-      if (!classStats[s.class]) classStats[s.class] = { hits: 0, total: 0 };
-      classStats[s.class].hits += s.hits;
-      classStats[s.class].total += total;
+      const fullClassName = `${s.school} - ${s.class}`;
+      if (!classStats[fullClassName]) classStats[fullClassName] = { hits: 0, total: 0 };
+      classStats[fullClassName].hits += s.hits;
+      classStats[fullClassName].total += total;
 
       const gLabel = s.grade === 12 ? '3º Ensino Médio' : `${s.grade}º Ano`;
       if (!gradeStats[gLabel]) gradeStats[gLabel] = { hits: 0, total: 0 };
