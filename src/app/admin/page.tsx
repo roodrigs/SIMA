@@ -119,9 +119,11 @@ export default function AdminDashboard() {
       schools: Object.entries(schoolStats).map(([name, s]: any) => ({ school: name, score: Math.round((s.hits / s.total) * 100) })),
       classes: Object.entries(classStats).map(([name, s]: any) => {
         const parts = name.split(' - ');
+        const schoolName = parts[0];
+        const className = parts.slice(1).join(' - ');
         return { 
-          class: parts.slice(1).join(' - ') || name, 
-          school: parts[0],
+          class: className || schoolName, 
+          school: className ? schoolName : "Geral",
           fullClass: name,
           score: Math.round((s.hits / s.total) * 100) 
         };

@@ -131,11 +131,17 @@ export async function GET() {
 
     const classesData = Object.entries(classStats).map(([name, stats]) => {
       const parts = name.split(' - ');
-      const schoolName = parts[0];
-      const className = parts.slice(1).join(' - ');
+      let schoolName = parts[0];
+      let className = parts.slice(1).join(' - ');
+      
+      // Se não houver o separador, tratamos o nome como a própria turma e escola como "Geral"
+      if (!className) {
+        className = schoolName;
+        schoolName = "Geral";
+      }
       
       return {
-        class: className || name,
+        class: className,
         school: schoolName,
         fullClass: name,
         score: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
@@ -152,11 +158,16 @@ export async function GET() {
       else text = "Crítico. Necessário revisão completa dos fundamentos com a turma.";
       
       const parts = name.split(' - ');
-      const schoolName = parts[0];
-      const className = parts.slice(1).join(' - ');
+      let schoolName = parts[0];
+      let className = parts.slice(1).join(' - ');
+
+      if (!className) {
+        className = schoolName;
+        schoolName = "Geral";
+      }
 
       return { 
-        class: className || name, 
+        class: className, 
         school: schoolName,
         fullClass: name,
         score: Math.round(score), 
