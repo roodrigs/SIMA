@@ -364,30 +364,31 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Gráfico por Turma */}
+        <div className="grid grid-cols-1 gap-8">
+          {/* Gráfico por Turma - Full Width and Larger */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-success-50 text-success-600 rounded-xl flex items-center justify-center"><Users size={20} /></div>
               Desempenho por Turma (%)
             </h3>
-            <div className="h-[300px] w-full">
+            <div className={`w-full`} style={{ height: `${Math.max(400, data.classes.length * 40)}px` }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.classes}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="class" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} interval={0} />
-                  <YAxis hide domain={[0, 100]} />
+                <BarChart data={data.classes} layout="vertical" margin={{ left: 20, right: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
+                  <XAxis type="number" domain={[0, 100]} hide />
+                  <YAxis 
+                    dataKey="fullClass" 
+                    type="category" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} 
+                    width={250}
+                  />
                   <Tooltip 
                     cursor={{fill: '#f8fafc'}} 
                     contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
-                    labelFormatter={(value, payload) => {
-                      if (payload && payload.length > 0) {
-                        return `${payload[0].payload.school} - ${value}`;
-                      }
-                      return value;
-                    }}
                   />
-                  <Bar dataKey="score" radius={[8, 8, 8, 8]} barSize={40}>
+                  <Bar dataKey="score" radius={[0, 8, 8, 0]} barSize={20}>
                     {data.classes.map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={entry.score >= 80 ? '#10b981' : entry.score >= 60 ? '#3b82f6' : entry.score >= 40 ? '#f59e0b' : '#f43f5e'} />
                     ))}
