@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School, LayoutDashboard } from "lucide-react";
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Area, AreaChart as ReAreaChart
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Area, AreaChart as ReAreaChart, PieChart, Pie
 } from 'recharts';
 
 export default function AdminDashboard() {
@@ -103,6 +103,16 @@ export default function AdminDashboard() {
     const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
     const stdDev = Math.sqrt(scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length);
 
+    const performanceLevels = [
+      { name: 'Crítico', range: '0-4', value: scores.filter(s => s < 4).length, color: '#f43f5e' },
+      { name: 'Básico', range: '4-6', value: scores.filter(s => s >= 4 && s < 6).length, color: '#f59e0b' },
+      { name: 'Intermediário', range: '6-8', value: scores.filter(s => s >= 6 && s < 8).length, color: '#3b82f6' },
+      { name: 'Avançado', range: '8-10', value: scores.filter(s => s >= 8).length, color: '#10b981' },
+    ].map(level => ({
+      ...level,
+      percentage: scores.length > 0 ? Math.round((level.value / scores.length) * 100) : 0
+    }));
+
     return {
       students,
       global: {
@@ -116,6 +126,7 @@ export default function AdminDashboard() {
         nota: i,
         alunos: scores.filter(s => Math.round(s) === i).length
       })),
+      performanceLevels,
       categories: rawData.categories, // Categorias são globais, mas poderiam ser filtradas por avaliação se necessário
       schools: Object.entries(schoolStats).map(([name, s]: any) => ({ school: name, score: Math.round((s.hits / s.total) * 100) })),
       classes: Object.entries(classStats).map(([name, s]: any) => {
@@ -264,6 +275,58 @@ export default function AdminDashboard() {
             <div>
               <h3 className="text-surface-900/40 text-[10px] font-black uppercase tracking-widest">Desvio Padrão</h3>
               <p className="text-4xl font-black text-surface-900 tracking-tighter">{data.global.stdDev.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Frequência Relativa por Nível de Desempenho */}
+        <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
+          <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center"><Activity size={20} /></div>
+            Frequência Relativa: Níveis de Desempenho
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-2 h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.performanceLevels}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={8}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {data.performanceLevels.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="lg:col-span-2 flex flex-col justify-center gap-4">
+              {data.performanceLevels.map((level: any, i: number) => (
+                <div key={i} className="flex items-center justify-between p-5 bg-surface-50/50 rounded-[24px] border border-surface-100/50 hover:bg-white hover:shadow-md transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black shadow-lg" style={{ backgroundColor: level.color }}>
+                      {level.percentage}%
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-black text-surface-900">{level.name}</span>
+                      <span className="text-[10px] text-surface-900/40 font-black uppercase tracking-widest">Intervalo: {level.range}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-black text-2xl text-surface-900 group-hover:text-primary-600 transition-colors">{level.value}</span>
+                    <p className="text-[10px] font-black text-surface-900/40 uppercase tracking-widest">Alunos</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
