@@ -84,14 +84,29 @@ body {
   }
 
   .grid {
-    display: block !important;
+    display: grid !important;
   }
 
   .grid > div {
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
     page-break-inside: avoid !important;
     border: 1px solid #e2e8f0 !important;
-    width: 100% !important;
+  }
+
+  /* Specific adjustment for horizontal layout in print */
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  .xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
   }
 
   /* Force charts to be visible and properly sized */

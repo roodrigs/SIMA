@@ -151,23 +151,26 @@ export default function AdminDashboard() {
   const handleExportCSV = () => {
     if (!data || !data.students) return;
     
-    const headers = ["Aluno", "Escola", "Turma", "Serie", "Zona", "Rede", "Acertos", "Erros", "Media", "Operador", "Data"];
-    const csvContent = [
-      headers.join(","),
+    const headers = ["Aluno", "Escola", "Turma", "Série", "Zona", "Rede", "Acertos", "Erros", "Média", "Operador", "Data"];
+    const csvRows = [
+      headers.join(";"),
       ...data.students.map((s: any) => [
         `"${s.student}"`,
         `"${s.school}"`,
         `"${s.class}"`,
-        s.grade === 12 ? "3o EM" : `${s.grade}o Ano`,
+        s.grade === 12 ? "3º E.M." : `${s.grade}º Ano`,
         s.zone,
         s.schoolNetwork,
         s.hits,
         s.misses,
-        s.weightedAvg.toFixed(2),
+        s.weightedAvg.toFixed(2).replace('.', ','),
         `"${s.operator}"`,
         new Date(s.date).toLocaleDateString()
-      ].join(","))
-    ].join("\n");
+      ].join(";"))
+    ];
+
+    // Adiciona BOM (Byte Order Mark) para forçar o Excel a reconhecer UTF-8
+    const csvContent = "\uFEFF" + csvRows.join("\n");
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
