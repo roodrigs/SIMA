@@ -3,9 +3,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School, LayoutDashboard } from "lucide-react";
+import { GraduationCap, TrendingUp, TrendingDown, Activity, Award, LogOut, BarChart3, Users, Map, MapPin, Target, AreaChart, Search, School, LayoutDashboard, FileDown, Printer } from "lucide-react";
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Area, AreaChart as ReAreaChart, PieChart, Pie
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Area, AreaChart as ReAreaChart, PieChart, Pie
 } from 'recharts';
 
 export default function AdminDashboard() {
@@ -62,7 +62,6 @@ export default function AdminDashboard() {
     let totalHits = 0;
     let totalQuestions = 0;
     const scores: number[] = [];
-    const catStats: any = {};
     const schoolStats: any = {};
     const classStats: any = {};
     const gradeStats: any = {};
@@ -75,8 +74,6 @@ export default function AdminDashboard() {
       totalQuestions += total;
       scores.push(s.weightedAvg);
 
-      // Agrupamento para os mini-gráficos (seriam recalculados idealmente aqui)
-      // Para manter a consistência, vamos usar os dados dos alunos filtrados para remontar os gráficos
       if (!schoolStats[s.school]) schoolStats[s.school] = { hits: 0, total: 0 };
       schoolStats[s.school].hits += s.hits;
       schoolStats[s.school].total += total;
@@ -127,7 +124,7 @@ export default function AdminDashboard() {
         alunos: scores.filter(s => Math.round(s) === i).length
       })),
       performanceLevels,
-      categories: rawData.categories, // Categorias são globais, mas poderiam ser filtradas por avaliação se necessário
+      categories: rawData.categories,
       schools: Object.entries(schoolStats).map(([name, s]: any) => ({ school: name, score: Math.round((s.hits / s.total) * 100) })),
       classes: Object.entries(classStats).map(([name, s]: any) => {
         const parts = name.split(' - ');
@@ -151,6 +148,42 @@ export default function AdminDashboard() {
     router.push("/login");
   };
 
+  const handleExportCSV = () => {
+    if (!data || !data.students) return;
+    
+    const headers = ["Aluno", "Escola", "Turma", "Serie", "Zona", "Rede", "Acertos", "Erros", "Media", "Operador", "Data"];
+    const csvContent = [
+      headers.join(","),
+      ...data.students.map((s: any) => [
+        `"${s.student}"`,
+        `"${s.school}"`,
+        `"${s.class}"`,
+        s.grade === 12 ? "3o EM" : `${s.grade}o Ano`,
+        s.zone,
+        s.schoolNetwork,
+        s.hits,
+        s.misses,
+        s.weightedAvg.toFixed(2),
+        `"${s.operator}"`,
+        new Date(s.date).toLocaleDateString()
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `relatorio_sima_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading) return (
     <div className="min-h-screen bg-surface-50 flex flex-col items-center justify-center p-6 text-center">
       <div className="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin mb-4" />
@@ -162,7 +195,7 @@ export default function AdminDashboard() {
 
   return (
     <main className="min-h-screen bg-surface-50 flex flex-col pb-20">
-      <nav className="bg-white border-b border-surface-100 px-8 py-4 sticky top-0 z-50">
+      <nav className="bg-white border-b border-surface-100 px-8 py-4 sticky top-0 z-50 no-print">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20"><GraduationCap size={22}/></div>
@@ -191,19 +224,19 @@ export default function AdminDashboard() {
 
       <div className="flex-1 max-w-[1600px] mx-auto w-full p-6 md:p-12 space-y-12">
         {/* Filtros e Busca */}
-        <div className="bg-white p-8 rounded-[40px] border border-surface-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
-          <div className="flex items-center gap-4 w-full md:w-auto">
+        <div className="bg-white p-8 rounded-[40px] border border-surface-100 shadow-sm flex flex-col xl:flex-row gap-6 items-center justify-between no-print">
+          <div className="flex items-center gap-4 w-full xl:w-auto">
             <div className="w-12 h-12 bg-primary-50 text-primary-600 rounded-2xl flex items-center justify-center shadow-inner"><Search size={22} /></div>
             <input 
               type="text" 
               placeholder="Buscar aluno, escola ou operador..." 
-              className="bg-transparent font-bold text-surface-900 placeholder:text-surface-900/20 focus:outline-none w-full md:w-64"
+              className="bg-transparent font-bold text-surface-900 placeholder:text-surface-900/20 focus:outline-none w-full xl:w-64"
               value={filters.search}
               onChange={(e) => setFilters({...filters, search: e.target.value})}
             />
           </div>
           
-          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-center">
             <select 
               className="bg-surface-50 p-4 rounded-2xl font-bold text-surface-900 text-xs focus:outline-none border-none cursor-pointer"
               value={filters.school}
@@ -233,10 +266,25 @@ export default function AdminDashboard() {
             </select>
             <button 
               onClick={() => setFilters({ grade: "ALL", zone: "ALL", schoolNetwork: "ALL", school: "ALL", search: "" })}
-              className="p-4 bg-surface-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-surface-800 transition-all"
+              className="p-4 bg-surface-100 text-surface-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-surface-200 transition-all"
             >
-              Limpar Filtros
+              Limpar
             </button>
+            <div className="h-8 w-[1px] bg-surface-100 mx-2 hidden xl:block"></div>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-5 py-4 bg-success-50 text-success-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-success-100 transition-all"
+              >
+                <FileDown size={16} /> CSV
+              </button>
+              <button 
+                onClick={handlePrint}
+                className="flex items-center gap-2 px-5 py-4 bg-primary-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20"
+              >
+                <Printer size={16} /> Relatório
+              </button>
+            </div>
           </div>
         </div>
 
@@ -331,9 +379,47 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Gráficos Geográficos */}
+        {/* Diagnóstico Pedagógico por Turma */}
+        <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
+          <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
+            <div className="w-10 h-10 bg-warning-50 text-warning-600 rounded-xl flex items-center justify-center"><Award size={20} /></div>
+            Diagnóstico Pedagógico por Turma
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {data.classes.map((c: any, i: number) => {
+              let diagnostic = "";
+              let colorClass = "";
+              if (c.score >= 80) {
+                diagnostic = "Desempenho excelente. A turma domina a maioria dos conceitos.";
+                colorClass = "bg-success-50 text-success-700 border-success-100";
+              } else if (c.score >= 60) {
+                diagnostic = "Bom desempenho, mas requer reforço em tópicos específicos.";
+                colorClass = "bg-primary-50 text-primary-700 border-primary-100";
+              } else if (c.score >= 40) {
+                diagnostic = "Atenção necessária. Grande parte da turma apresenta dificuldades básicas.";
+                colorClass = "bg-warning-50 text-warning-700 border-warning-100";
+              } else {
+                diagnostic = "Crítico. Necessário revisão completa dos fundamentos com a turma.";
+                colorClass = "bg-danger-50 text-danger-700 border-danger-100";
+              }
+
+              return (
+                <div key={i} className={`p-6 rounded-[24px] border ${colorClass} space-y-3`}>
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col">
+                      <span className="font-black text-sm uppercase tracking-tight">{c.school}</span>
+                      <span className="font-bold text-lg">{c.class}</span>
+                    </div>
+                    <span className="font-black text-2xl">{c.score}%</span>
+                  </div>
+                  <p className="text-xs font-medium leading-relaxed opacity-80">{diagnostic}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Por Zona */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-success-50 text-success-600 rounded-xl flex items-center justify-center"><Map size={20} /></div>
@@ -352,7 +438,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Por Rede */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-warning-50 text-warning-500 rounded-xl flex items-center justify-center"><MapPin size={20} /></div>
@@ -372,7 +457,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Gráfico de Desvio Padrão / Curva de Aprendizado */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <div className="flex justify-between items-center">
@@ -380,9 +464,6 @@ export default function AdminDashboard() {
                 <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center"><AreaChart size={20} /></div>
                 Distribuição de Notas (Curva de Aprendizado)
               </h3>
-              <div className="text-right">
-                <p className="text-[10px] font-black text-surface-900/40 uppercase tracking-widest">Frequência de Notas</p>
-              </div>
             </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -394,7 +475,7 @@ export default function AdminDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="nota" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} label={{ value: 'Nota (0-10)', position: 'insideBottom', offset: -5, fontSize: 10, fontWeight: 'bold' }} />
+                  <XAxis dataKey="nota" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: '900', fill: '#94a3b8'}} />
                   <YAxis hide />
                   <Tooltip contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}} />
                   <Area type="monotone" dataKey="alunos" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorAlunos)" />
@@ -403,7 +484,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Gráfico por Matéria Re-estilizado */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-danger-50 text-danger-600 rounded-xl flex items-center justify-center"><BarChart3 size={20} /></div>
@@ -428,7 +508,6 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-8">
-          {/* Gráfico por Turma - Full Width and Larger */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-success-50 text-success-600 rounded-xl flex items-center justify-center"><Users size={20} /></div>
@@ -461,7 +540,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Gráfico por Escola */}
           <div className="bg-white p-10 rounded-[40px] border border-surface-100 shadow-sm space-y-8">
             <h3 className="text-xl font-black text-surface-900 flex items-center gap-3">
               <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center"><School size={20} /></div>

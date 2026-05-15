@@ -61,3 +61,60 @@ body {
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media print {
+  nav, 
+  .no-print,
+  button,
+  select,
+  input,
+  .print-hidden {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  .grid > div {
+    margin-bottom: 2rem !important;
+    page-break-inside: avoid !important;
+    border: 1px solid #e2e8f0 !important;
+    width: 100% !important;
+  }
+
+  /* Force charts to be visible and properly sized */
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 350px !important;
+  }
+
+  .rounded-\[40px\], .rounded-\[32px\] {
+    border-radius: 12px !important;
+  }
+
+  table {
+    page-break-inside: auto !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+}
+
