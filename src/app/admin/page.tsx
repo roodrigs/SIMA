@@ -277,15 +277,9 @@ export default function AdminDashboard() {
             <div className="flex gap-2">
               <button 
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 px-5 py-4 bg-success-50 text-success-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-success-100 transition-all"
+                className="flex items-center gap-3 px-8 py-4 bg-primary-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20 active:scale-[0.98]"
               >
-                <FileDown size={16} /> CSV
-              </button>
-              <button 
-                onClick={handlePrint}
-                className="flex items-center gap-2 px-5 py-4 bg-primary-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20"
-              >
-                <Printer size={16} /> Relatório
+                <FileDown size={18} /> Baixar Relatório
               </button>
             </div>
           </div>
